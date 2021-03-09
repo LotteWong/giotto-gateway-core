@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/LotteWong/giotto-gateway/dto"
 	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"

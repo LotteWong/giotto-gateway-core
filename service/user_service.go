@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/dao"
-	"github.com/LotteWong/giotto-gateway/dto"
-	"github.com/LotteWong/giotto-gateway/po"
+	"github.com/LotteWong/giotto-gateway/models/dto"
+	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/utils"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/contrib/sessions"
@@ -69,6 +69,7 @@ func (s *UserService) ChangeUserPassword(ctx *gin.Context, tx *gorm.DB, req *dto
 	user := &po.Admin{
 		Id:       loginSessionStruct.Id,
 		Username: loginSessionStruct.Username,
+		IsDelete: 0,
 	}
 	user, err := s.userOperator.Find(ctx, tx, user)
 	if err != nil {

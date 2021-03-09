@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/LotteWong/giotto-gateway/dto"
 	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
@@ -20,10 +20,10 @@ func RegistUserRoutes(grp *gin.RouterGroup) {
 // @Summary 查询用户信息接口
 // @Description 获取用户的信息
 // @Tags 用户接口
-// @Id /user/admin
+// @Id /users/admin
 // @Produce  json
 // @Success 200 {object} middleware.Response{data=dto.UserInfo} "success"
-// @Router /user/admin [get]
+// @Router /users/admin [get]
 func (c *UserController) GetUserInfo(ctx *gin.Context) {
 	userInfo, err := service.GetUserService().GetUserInfo(ctx)
 	if err != nil {
@@ -38,12 +38,12 @@ func (c *UserController) GetUserInfo(ctx *gin.Context) {
 // @Summary 修改用户密码接口
 // @Description 修改用户的密码
 // @Tags 用户接口
-// @Id /user/admin
+// @Id /users/admin
 // @Accept  json
 // @Produce  json
 // @Param body body dto.ChangeUserPwdReq true "change user password request body"
 // @Success 200 {object} middleware.Response{data=string} "success"
-// @Router /user/admin [POST]
+// @Router /users/admin [POST]
 func (c *UserController) ChangeUserPwd(ctx *gin.Context) {
 	// validate request params
 	req := &dto.ChangeUserPwdReq{}

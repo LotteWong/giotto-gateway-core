@@ -66,9 +66,23 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		})
 	})
 
+	// TODO: not sure the negative sides of using the same middlewares
 	store, err := sessions.NewRedisStore(10, "tcp", "127.0.0.1:6379", "", []byte("secret"))
 	if err != nil {
 		log.Fatalf("sessions.NewRedisStore err: %v", err)
+	}
+	withoutSessionAuthMiddlewares := []gin.HandlerFunc{
+		sessions.Sessions("gateway_session", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.TranslationMiddleware(),
+	}
+	withSessionAuthMiddlewares := []gin.HandlerFunc{
+		sessions.Sessions("gateway_session", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware(),
 	}
 
 	// swagger api routes
@@ -82,13 +96,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// login api routes
 	loginGroup := router.Group("")
-	loginGroupMiddlewares := []gin.HandlerFunc{
-		sessions.Sessions("gateway_session", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.TranslationMiddleware(),
-	}
-	loginGroup.Use(loginGroupMiddlewares...)
+	loginGroup.Use(withoutSessionAuthMiddlewares...)
 	{
 		// POST   /login
 		// POST   /logout
@@ -96,18 +104,19 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	}
 
 	// user api routes
-	userGroup := router.Group("/user")
-	userGroupMiddlewares := []gin.HandlerFunc{
-		sessions.Sessions("gateway_session", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
-		middleware.TranslationMiddleware(),
-	}
-	userGroup.Use(userGroupMiddlewares...)
+	userGroup := router.Group("/users")
+	userGroup.Use(withSessionAuthMiddlewares...)
 	{
-		// GET    /user/admin
+		// GET    /users/admin
 		controller.RegistUserRoutes(userGroup)
+	}
+
+	// service api routes
+	serviceGroup := router.Group("/services")
+	serviceGroup.Use(withSessionAuthMiddlewares...)
+	{
+		// GET    /services
+		controller.RegistServiceRoutes(serviceGroup)
 	}
 
 	return router

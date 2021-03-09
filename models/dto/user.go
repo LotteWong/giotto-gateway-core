@@ -17,7 +17,7 @@ type UserInfo struct {
 
 type ChangeUserPwdReq struct {
 	Password string `json:"password" form:"password" comment:"登录密码" example:"123456" validate:"required"`
-}
+} // 登录密码
 
 type ChangeUserPwdRes struct {
 }
