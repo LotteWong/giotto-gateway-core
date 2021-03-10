@@ -8,7 +8,7 @@ type AccessControl struct {
 	WhiteList     string `json:"white_list" gorm:"column:white_list" description:"白名单ip"`
 	WhiteHostName string `json:"white_host_name" gorm:"column:white_host_name" description:"白名单主机"`
 	//BlackHostName     string `json:"black_host_name" gorm:"column:black_host_name" description:"黑名单主机"`
-	ClientIPFlowLimit    int `json:"client_ip_flow_limit" gorm:"column:client_ip_flow_limit" description:"客户端ip限流"`
+	ClientIpFlowLimit    int `json:"client_ip_flow_limit" gorm:"column:client_ip_flow_limit" description:"客户端ip限流"`
 	ServiceHostFlowLimit int `json:"service_host_flow_limit" gorm:"column:service_host_flow_limit" description:"服务端主机限流"`
 }
 
