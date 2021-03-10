@@ -30,3 +30,84 @@ type Service struct {
 func (params *ListServicesReq) BindAndValidListServicesReq(ctx *gin.Context) error {
 	return utils.DefaultGetValidParams(ctx, params)
 }
+
+type CreateOrUpdateHttpServiceReq struct {
+	ServiceName string `json:"service_name" form:"service_name" comment:"服务名称" example:"" validate:"required,valid_service_name"` // 服务名称
+	ServiceDesc string `json:"service_desc" form:"service_desc" comment:"服务描述" example:"" validate:"max=255,min=0"`               // 服务描述
+
+	RuleType        int    `json:"rule_type" form:"rule_type" comment:"接入类型" example:"" validate:"max=1,min=0"`                              // 接入类型
+	Rule            string `json:"rule" form:"rule" comment:"域名或者前缀" example:"" validate:"required,valid_rule"`                              // 域名或者前缀
+	NeedHttps       int    `json:"need_https" form:"need_https" comment:"支持https" example:"" validate:"max=1,min=0"`                         // 支持https
+	NeedStripUri    int    `json:"need_strip_uri" form:"need_strip_uri" comment:"启用strip_uri" example:"" validate:"max=1,min=0"`             // 启用strip_uri
+	NeedWebsocket   int    `json:"need_websocket" form:"need_websocket" comment:"支持websocket" example:"" validate:"max=1,min=0"`             // 支持websocket
+	UrlRewrite      string `json:"url_rewrite" form:"url_rewrite" comment:"url重写功能" example:"" validate:"valid_url_rewrite"`                 // 启用url重写
+	HeaderTransform string `json:"header_transform" form:"header_transform" comment:"header转换" example:"" validate:"valid_header_transform"` // header转换
+
+	OpenAuth             int    `json:"open_auth" form:"open_auth" comment:"是否开启权限" example:"" validate:"max=1,min=0"`                        // 是否开启权限
+	BlackList            string `json:"black_list" form:"black_list" comment:"黑名单ip" example:"" validate:""`                                  // 黑名单ip列表
+	WhiteList            string `json:"white_list" form:"white_list" comment:"白名单ip" example:"" validate:""`                                  // 白名单ip列表
+	ClientIpFlowLimit    int    `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
+	ServiceHostFlowLimit int    `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
+
+	RoundType              int    `json:"round_type" form:"round_type" comment:"轮询方式" example:"" validate:"max=3,min=0"`                                   // 轮询方式
+	IpList                 string `json:"ip_list" form:"ip_list" comment:"ip列表" example:"" validate:"required,valid_ip_port_list"`                         // ip列表
+	WeightList             string `json:"weight_list" form:"weight_list" comment:"权重列表" example:"" validate:"required,valid_weight_list"`                  // 权重列表
+	UpstreamConnectTimeout int    `json:"upstream_connect_timeout" form:"upstream_connect_timeout" comment:"建立连接超时时间, 单位为s" example:"" validate:"min=0"`   // 建立连接超时时间, 单位为s
+	UpstreamHeaderTimeout  int    `json:"upstream_header_timeout" form:"upstream_header_timeout" comment:"获取header超时时间, 单位为s" example:"" validate:"min=0"` // 获取header超时时间, 单位为s
+	UpstreamIdleTimeout    int    `json:"upstream_idle_timeout" form:"upstream_idle_timeout" comment:"连接最大空闲时间, 单位为s" example:"" validate:"min=0"`         // 连接最大空闲时间, 单位为s
+	UpstreamMaxIdle        int    `json:"upstream_max_idle" form:"upstream_max_idle" comment:"最大连接空闲数量" example:"" validate:"min=0"`                       // 最大连接空闲数量
+}
+
+func (params *CreateOrUpdateHttpServiceReq) BindAndValidCreateOrUpdateHttpServiceReq(ctx *gin.Context) error {
+	return utils.DefaultGetValidParams(ctx, params)
+}
+
+type CreateOrUpdateTcpServiceReq struct {
+	ServiceName string `json:"service_name" form:"service_name" comment:"服务名称" validate:"required,valid_service_name"` // 服务名称
+	ServiceDesc string `json:"service_desc" form:"service_desc" comment:"服务描述" validate:"max=255,min=0"`               // 服务描述
+	Port        int    `json:"port" form:"port" comment:"端口，需要设置在8001-8999范围内" validate:"required,min=8001,max=8999"`  // 端口
+
+	OpenAuth             int    `json:"open_auth" form:"open_auth" comment:"是否开启权限" example:"" validate:"max=1,min=0"`                        // 是否开启权限
+	BlackList            string `json:"black_list" form:"black_list" comment:"黑名单ip" example:"" validate:"valid_ip_list"`                     // 黑名单ip列表
+	WhiteList            string `json:"white_list" form:"white_list" comment:"白名单ip" example:"" validate:"valid_ip_list"`                     // 白名单ip列表
+	WhiteHostName        string `json:"white_host_name" form:"white_host_name" comment:"白名单主机列表" validate:"valid_ip_list"`                    // 白名单主机列表
+	ClientIpFlowLimit    int    `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
+	ServiceHostFlowLimit int    `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
+
+	RoundType  int    `json:"round_type" form:"round_type" comment:"轮询方式" example:"" validate:"max=3,min=0"`                  // 轮询方式
+	IpList     string `json:"ip_list" form:"ip_list" comment:"ip列表" example:"" validate:"required,valid_ip_port_list"`        // ip列表
+	WeightList string `json:"weight_list" form:"weight_list" comment:"权重列表" example:"" validate:"required,valid_weight_list"` // 权重列表
+	ForbidList string `json:"forbid_list" form:"forbid_list" comment:"禁用ip列表" validate:"valid_ip_list"`                       // 禁用ip列表
+}
+
+func (params *CreateOrUpdateTcpServiceReq) BindAndValidCreateOrUpdateTcpServiceReq(ctx *gin.Context) error {
+	return utils.DefaultGetValidParams(ctx, params)
+}
+
+type CreateOrUpdateGrpcServiceReq struct {
+	ServiceName     string `json:"service_name" form:"service_name" comment:"服务名称" validate:"required,valid_service_name"`                   // 服务名称
+	ServiceDesc     string `json:"service_desc" form:"service_desc" comment:"服务描述" validate:"max=255,min=0"`                                 // 服务描述
+	Port            int    `json:"port" form:"port" comment:"端口，需要设置在8001-8999范围内" validate:"required,min=8001,max=8999"`                    // 端口
+	HeaderTransform string `json:"header_transform" form:"header_transform" comment:"header转换" example:"" validate:"valid_header_transform"` // header转换
+
+	OpenAuth             int    `json:"open_auth" form:"open_auth" comment:"是否开启权限" example:"" validate:"max=1,min=0"`                        // 是否开启权限
+	BlackList            string `json:"black_list" form:"black_list" comment:"黑名单ip" example:"" validate:"valid_ip_list"`                     // 黑名单ip列表
+	WhiteList            string `json:"white_list" form:"white_list" comment:"白名单ip" example:"" validate:"valid_ip_list"`                     // 白名单ip列表
+	WhiteHostName        string `json:"white_host_name" form:"white_host_name" comment:"白名单主机列表" validate:"valid_ip_list"`                    // 白名单主机列表
+	ClientIpFlowLimit    int    `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
+	ServiceHostFlowLimit int    `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
+
+	RoundType  int    `json:"round_type" form:"round_type" comment:"轮询方式" example:"" validate:"max=3,min=0"`                  // 轮询方式
+	IpList     string `json:"ip_list" form:"ip_list" comment:"ip列表" example:"" validate:"required,valid_ip_port_list"`        // ip列表
+	WeightList string `json:"weight_list" form:"weight_list" comment:"权重列表" example:"" validate:"required,valid_weight_list"` // 权重列表
+	ForbidList string `json:"forbid_list" form:"forbid_list" comment:"禁用ip列表" validate:"valid_ip_list"`                       // 禁用ip列表
+}
+
+func (params *CreateOrUpdateGrpcServiceReq) BindAndValidCreateOrUpdateGrpcServiceReq(ctx *gin.Context) error {
+	return utils.DefaultGetValidParams(ctx, params)
+}
+
+type ServiceStatus struct {
+	TodayFlow     []int64 `json:"today_flow" form:"today_flow" comment:"今日流量列表" example:"" validate:""`         // 今日流量列表
+	YesterdayFlow []int64 `json:"yesterday_flow" form:"yesterday_flow" comment:"昨日流量列表" example:"" validate:""` // 昨日流量列表
+}
