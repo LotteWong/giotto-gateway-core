@@ -7,7 +7,6 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"strconv"
-	"time"
 )
 
 type ServiceController struct{}
@@ -16,7 +15,6 @@ func RegistServiceRoutes(grp *gin.RouterGroup) {
 	controller := &ServiceController{}
 	grp.GET("", controller.ListServices)
 	grp.GET("/:service_id", controller.ShowService)
-	grp.GET("/:service_id/status", controller.GetServiceStatus)
 	grp.POST("/http", controller.CreateHttpService)
 	grp.POST("/tcp", controller.CreateTcpService)
 	grp.PUT("/tcp/:service_id", controller.UpdateTcpService)
@@ -66,8 +64,8 @@ func (c *ServiceController) ListServices(ctx *gin.Context) {
 }
 
 // ShowService godoc
-// @Summary 查询http服务详情接口
-// @Description 查询http服务详情
+// @Summary 查询服务详情接口
+// @Description 查询服务详情
 // @Tags 服务接口
 // @Id /services/{service_id}
 // @Produce  json
@@ -92,43 +90,6 @@ func (c *ServiceController) ShowService(ctx *gin.Context) {
 		return
 	}
 
-	middleware.ResponseSuccess(ctx, res)
-}
-
-// GetServiceStatus godoc
-// @Summary 查询http服务状态接口
-// @Description 查询http服务状态
-// @Tags 服务接口
-// @Id /services/{service_id}/status
-// @Produce  json
-// @Param service_id path string true "service id"
-// @Success 200 {object} middleware.Response{data=dto.ServiceStatus} "success"
-// @Router /services/{service_id}/status [get]
-func (c *ServiceController) GetServiceStatus(ctx *gin.Context) {
-	_, err := strconv.Atoi(ctx.Param("service_id"))
-	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
-		return
-	}
-
-	//tx, err := lib.GetGormPool("default")
-	//if err != nil {
-	//	middleware.ResponseError(ctx, 3001, err)
-	//	return
-	//}
-	var todayFlow []int64
-	var yesterdayFlow []int64
-	for i := 0; i <= time.Now().Hour(); i++ {
-		todayFlow = append(todayFlow, 0)
-	}
-	for i := 0; i <= 23; i++ {
-		yesterdayFlow = append(yesterdayFlow, 0)
-	}
-
-	res := &dto.ServiceStatus{
-		TodayFlow:     todayFlow,
-		YesterdayFlow: yesterdayFlow,
-	}
 	middleware.ResponseSuccess(ctx, res)
 }
 
@@ -375,7 +336,7 @@ func (c *ServiceController) DeleteService(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 3001, err)
 		return
 	}
-	err = service.GetSvcService().DeleteServices(ctx, tx, int64(serviceId))
+	err = service.GetSvcService().DeleteService(ctx, tx, int64(serviceId))
 	if err != nil {
 		middleware.ResponseError(ctx, 3002, err)
 		return

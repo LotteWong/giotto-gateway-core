@@ -39,20 +39,20 @@ func GetSvcService() *SvcService {
 	return svcService
 }
 
-func (s *SvcService) ListServices(ctx *gin.Context, tx *gorm.DB, req *dto.ListServicesReq) (int64, []dto.Service, error) {
+func (s *SvcService) ListServices(ctx *gin.Context, tx *gorm.DB, req *dto.ListServicesReq) (int64, []dto.ListServiceItem, error) {
 	total, serviceInfoItems, err := s.serviceOperator.FuzzySearchAndPage(ctx, tx, req.Keyword, req.PageIndex, req.PageSize)
 	if err != nil {
 		return 0, nil, errors.New(fmt.Sprintf("failed to page services with condition %v, err: %v", req, err))
 	}
 
-	var serviceItems []dto.Service
+	var serviceItems []dto.ListServiceItem
 	for _, serviceInfoItem := range serviceInfoItems {
 		serviceDetail, err := s.getServiceDetail(ctx, tx, serviceInfoItem.Id)
 		if err != nil {
 			return 0, nil, errors.New(fmt.Sprintf("failed to get service detail of %s, err: %v", serviceInfoItem.ServiceName, err))
 		}
 
-		serviceItem := dto.Service{
+		serviceItem := dto.ListServiceItem{
 			Id:          serviceInfoItem.Id,
 			ServiceName: serviceInfoItem.ServiceName,
 			ServiceDesc: serviceInfoItem.ServiceDesc,
@@ -522,7 +522,7 @@ func (s *SvcService) UpdateGrpcService(ctx *gin.Context, tx *gorm.DB, req *dto.C
 	return serviceDetail, nil
 }
 
-func (s *SvcService) DeleteServices(ctx *gin.Context, tx *gorm.DB, serviceId int64) error {
+func (s *SvcService) DeleteService(ctx *gin.Context, tx *gorm.DB, serviceId int64) error {
 	serviceInfo, err := s.serviceOperator.Find(ctx, tx, &po.ServiceInfo{Id: serviceId})
 	if err != nil {
 		return err
