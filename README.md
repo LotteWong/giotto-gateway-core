@@ -10,3 +10,4 @@ A powerful golang microservice api gateway.
 - [x] Query / Update Admin Info
 - [x] CURD Http/Tcp/Grpc Service
 - [x] CURD App
+- [x] Dashboard Flow/Percentage/Statistics

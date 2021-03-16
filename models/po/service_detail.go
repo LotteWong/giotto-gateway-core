@@ -8,3 +8,8 @@ type ServiceDetail struct {
 	LoadBalance   *LoadBalance   `json:"load_balance" desciption:"load_balance"`
 	AccessControl *AccessControl `json:"access_control" desciption:"access_control"`
 }
+
+type ServicePercentage struct {
+	ServiceType  int   `json:"service_type" description:"服务类型"`
+	ServiceCount int64 `json:"service_count" description:"服务个数"`
+}
