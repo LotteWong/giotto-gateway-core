@@ -140,5 +140,17 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		controller.RegistAppRoutes(appGroup)
 	}
 
+	// dashboard api routes
+	dashboardGroup := router.Group("/dashboard")
+	dashboardGroup.Use(withSessionAuthMiddlewares...)
+	{
+		// GET    /dashboard/statistics
+		// GET    /dashboard/flow
+		// GET    /dashboard/flow/services/:service_id
+		// GET    /dashboard/flow/apps/:app_id
+		// GET    /dashboard/percentage/services
+		controller.RegistDashboardRoutes(dashboardGroup)
+	}
+
 	return router
 }

@@ -75,12 +75,12 @@ func (s *SvcService) concatServiceAddr(detail *po.ServiceDetail) string {
 	clusterSSLPort := lib.GetStringConf("base.cluster.cluster_ssl_port")
 
 	if detail.HttpRule != nil {
-		if detail.Info.ServiceType == constants.ServiceTypeHttp && detail.HttpRule.RuleType == constants.HttpRuleTypePrefixUrl && detail.HttpRule.NeedHttps == constants.DisableHttps {
+		if detail.Info.ServiceType == constants.ServiceTypeHttp && detail.HttpRule.RuleType == constants.HttpRuleTypePrefixUrl && detail.HttpRule.NeedHttps == constants.Disable {
 			addr = fmt.Sprintf("%s:%s%s", clusterIp, clusterPort, detail.HttpRule.Rule)
 			return addr
 		}
 
-		if detail.Info.ServiceType == constants.ServiceTypeHttp && detail.HttpRule.RuleType == constants.HttpRuleTypePrefixUrl && detail.HttpRule.NeedHttps == constants.EnableHttps {
+		if detail.Info.ServiceType == constants.ServiceTypeHttp && detail.HttpRule.RuleType == constants.HttpRuleTypePrefixUrl && detail.HttpRule.NeedHttps == constants.Enable {
 			addr = fmt.Sprintf("%s:%s%s", clusterIp, clusterSSLPort, detail.HttpRule.Rule)
 			return addr
 		}

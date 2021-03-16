@@ -52,3 +52,14 @@ func (o *ServiceOperator) FuzzySearchAndPage(ctx *gin.Context, tx *gorm.DB, keyw
 
 	return total, items, nil
 }
+
+func (o *ServiceOperator) GroupByServiceType(ctx *gin.Context, tx *gorm.DB) ([]po.ServicePercentage, error) {
+	var groups []po.ServicePercentage
+
+	query := tx.SetCtx(utils.GetGinTraceContext(ctx)).Table((&po.ServiceInfo{}).TableName()).Where("is_delete=0")
+	if err := query.Select("service_type, count(*) as service_count").Group("service_type").Scan(&groups).Error; err != nil {
+		return nil, err
+	}
+
+	return groups, nil
+}

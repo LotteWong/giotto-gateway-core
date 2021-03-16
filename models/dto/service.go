@@ -106,8 +106,3 @@ type CreateOrUpdateGrpcServiceReq struct {
 func (params *CreateOrUpdateGrpcServiceReq) BindAndValidCreateOrUpdateGrpcServiceReq(ctx *gin.Context) error {
 	return utils.DefaultGetValidParams(ctx, params)
 }
-
-type ServiceStatus struct {
-	TodayFlow     []int64 `json:"today_flow" form:"today_flow" comment:"今日流量列表" example:"" validate:""`         // 今日流量列表
-	YesterdayFlow []int64 `json:"yesterday_flow" form:"yesterday_flow" comment:"昨日流量列表" example:"" validate:""` // 昨日流量列表
-}

@@ -8,6 +8,14 @@ const (
 	HttpRuleTypePrefixUrl = 0
 	HttpRuleTypeDomain    = 1
 
-	DisableHttps = 0
-	EnableHttps  = 1
+	Disable = 0
+	Enable  = 1
+)
+
+var (
+	ServiceTypeMap = map[int]string{
+		ServiceTypeHttp: "Http",
+		ServiceTypeTcp:  "Tcp",
+		ServiceTypeGrpc: "Grpc",
+	}
 )
