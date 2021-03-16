@@ -12,11 +12,11 @@ type ListServicesReq struct {
 }
 
 type ListServicesRes struct {
-	Total int64     `json:"total" form:"total" comment:"共计条数" example:"0" validate:""` // 共计条数
-	Items []Service `json:"items" form:"items" comment:"服务列表" example:"" validate:""`  // 服务列表
+	Total int64             `json:"total" form:"total" comment:"共计条数" example:"0" validate:""` // 共计条数
+	Items []ListServiceItem `json:"items" form:"items" comment:"服务列表" example:"" validate:""`  // 服务列表
 }
 
-type Service struct {
+type ListServiceItem struct {
 	Id          int64  `json:"id" form:"id"`
 	ServiceName string `json:"service_name" form:"service_name"`
 	ServiceDesc string `json:"service_desc" form:"service_desc"`

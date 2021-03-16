@@ -108,6 +108,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	userGroup.Use(withSessionAuthMiddlewares...)
 	{
 		// GET    /users/admin
+		// PATCH  /users/admin
 		controller.RegistUserRoutes(userGroup)
 	}
 
@@ -116,7 +117,27 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	serviceGroup.Use(withSessionAuthMiddlewares...)
 	{
 		// GET    /services
+		// GET    /services/:service_id
+		// POST   /services/http
+		// PUT    /services/http/:service_id
+		// POST   /services/tcp
+		// PUT    /services/tcp/:service_id
+		// POST   /services/grpc
+		// PUT    /services/grpc/:service_id
+		// DELETE /services/:service_id
 		controller.RegistServiceRoutes(serviceGroup)
+	}
+
+	// app api routes
+	appGroup := router.Group("/apps")
+	appGroup.Use(withSessionAuthMiddlewares...)
+	{
+		// GET    /apps
+		// GET    /apps/:app_id
+		// POST   /apps
+		// PUT    /apps/:app_id
+		// DELETE /apps/:app_id
+		controller.RegistAppRoutes(appGroup)
 	}
 
 	return router

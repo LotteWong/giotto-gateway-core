@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
 	"hash"
+	"io"
 )
 
 func GenSaltPwd(salt, password string) string {
@@ -18,4 +20,12 @@ func GenSaltPwd(salt, password string) string {
 	cipherAfterConcat := fmt.Sprintf("%x", encrypter.Sum(nil))
 
 	return cipherAfterConcat
+}
+
+func MD5(text string) (string, error) {
+	h := md5.New()
+	if _, err := io.WriteString(h, text); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
