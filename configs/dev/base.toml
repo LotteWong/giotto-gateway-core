@@ -10,9 +10,13 @@
     write_timeout = 10                  # 写入超时时长
     max_header_bytes = 20               # 最大的header大小，二进制位长度
     allow_ip = [                        # 白名单ip列表
-        "127.0.0.1",
-        "192.168.1.1"
+        "127.0.0.1"
     ]
+
+[cluster]
+    cluster_ip="127.0.0.1"
+    cluster_port="8880"
+    cluster_ssl_port="4880"
 
 [log]
     log_level = "trace"         #日志打印最低级别
@@ -26,13 +30,24 @@
         on = false
         color = false
 
-[cluster]
-    cluster_ip="127.0.0.1"
-    cluster_port="8880"
-    cluster_ssl_port="4880"
-
 [swagger]
     title="giotto-gateway swagger API"
     desc="This is a sample server celler server."
     host="127.0.0.1:8880"
     base_path=""
+
+[rate_limiter] # 限流器配置
+    enable=true # 是否开启
+    rate=1 # 令牌生产速率
+    burst=1000 # 最大令牌数量
+
+[circuit_breaker] # 熔断器配置
+    enable=true # 是否开启
+    enable_dashboard=false # 开启监控面板
+    dashboard_port=2001 # 监控面板端口
+    timeout=1000 # 单次请求超时时间
+    max_concurrent_requests=100 # 最大并发请求数量
+    sleep_window=5000 # 熔断尝试重试时间
+    request_volume_threshold=100 # 十秒采样请求数据量
+    error_percent_threshold=50 # 十秒采样错误比率
+
