@@ -66,23 +66,23 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		})
 	})
 
-	// TODO: not sure the negative sides of using the same middlewares
 	store, err := sessions.NewRedisStore(10, "tcp", "127.0.0.1:6379", "", []byte("secret"))
 	if err != nil {
 		log.Fatalf("sessions.NewRedisStore err: %v", err)
 	}
-	withoutSessionAuthMiddlewares := []gin.HandlerFunc{
+	commonMiddlewares := []gin.HandlerFunc{
 		sessions.Sessions("gateway_session", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware(),
 	}
-	withSessionAuthMiddlewares := []gin.HandlerFunc{
-		sessions.Sessions("gateway_session", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
-		middleware.TranslationMiddleware(),
+	enableRateLimiter := lib.GetBoolConf("base.rate_limiter.enable")
+	if enableRateLimiter {
+		commonMiddlewares = append(commonMiddlewares, middleware.RateLimitMiddleware())
+	}
+	enableCircuitBreaker := lib.GetBoolConf("base.circuit_breaker.enable")
+	if enableCircuitBreaker {
+		commonMiddlewares = append(commonMiddlewares, middleware.CircuitBreakMiddleware())
 	}
 
 	// swagger api routes
@@ -96,7 +96,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// login api routes
 	loginGroup := router.Group("")
-	loginGroup.Use(withoutSessionAuthMiddlewares...)
+	loginGroup.Use(commonMiddlewares...)
 	{
 		// POST   /login
 		// POST   /logout
@@ -105,7 +105,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// user api routes
 	userGroup := router.Group("/users")
-	userGroup.Use(withSessionAuthMiddlewares...)
+	userGroup.Use(commonMiddlewares...)
+	userGroup.Use(middleware.SessionAuthMiddleware())
 	{
 		// GET    /users/admin
 		// PATCH  /users/admin
@@ -114,7 +115,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// service api routes
 	serviceGroup := router.Group("/services")
-	serviceGroup.Use(withSessionAuthMiddlewares...)
+	serviceGroup.Use(commonMiddlewares...)
+	serviceGroup.Use(middleware.SessionAuthMiddleware())
 	{
 		// GET    /services
 		// GET    /services/:service_id
@@ -130,7 +132,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// app api routes
 	appGroup := router.Group("/apps")
-	appGroup.Use(withSessionAuthMiddlewares...)
+	appGroup.Use(commonMiddlewares...)
+	appGroup.Use(middleware.SessionAuthMiddleware())
 	{
 		// GET    /apps
 		// GET    /apps/:app_id
@@ -142,7 +145,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// dashboard api routes
 	dashboardGroup := router.Group("/dashboard")
-	dashboardGroup.Use(withSessionAuthMiddlewares...)
+	dashboardGroup.Use(commonMiddlewares...)
+	dashboardGroup.Use(middleware.SessionAuthMiddleware())
 	{
 		// GET    /dashboard/statistics
 		// GET    /dashboard/flow
