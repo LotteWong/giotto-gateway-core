@@ -50,4 +50,3 @@
     sleep_window=5000 # 熔断尝试重试时间
     request_volume_threshold=100 # 十秒采样请求数据量
     error_percent_threshold=50 # 十秒采样错误比率
-
