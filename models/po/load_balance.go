@@ -1,6 +1,9 @@
 package po
 
-import "strings"
+import (
+	"github.com/LotteWong/giotto-gateway/load_balance"
+	"strings"
+)
 
 type LoadBalance struct {
 	Id            int64  `json:"id" gorm:"primary_key" description:"自增主键"`
@@ -33,4 +36,9 @@ func (t *LoadBalance) GetDisabledIpList() []string {
 
 func (t *LoadBalance) GetWeightList() []string {
 	return strings.Split(t.WeightList, ",")
+}
+
+type LoadBalanceDetail struct {
+	LoadBalancer load_balance.LoadBalance `json:"info" description:"负载均衡器"`
+	ServiceName  string                   `json:"service_name" description:"服务名称"`
 }

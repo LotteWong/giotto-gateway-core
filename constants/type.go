@@ -10,6 +10,11 @@ const (
 
 	Disable = 0
 	Enable  = 1
+
+	LbTypeRandom           = 0
+	LbTypeRoundRobin       = 1
+	LbTypeWeightRoundRobin = 2
+	LbTypeConsistentHash   = 3
 )
 
 var (
