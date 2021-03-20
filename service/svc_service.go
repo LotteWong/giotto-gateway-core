@@ -10,12 +10,20 @@ import (
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"net/http/httptest"
 	"strings"
+	"sync"
 )
 
 var svcService *SvcService
 
 type SvcService struct {
+	ServiceMap   map[string]*po.ServiceDetail
+	ServiceSlice []*po.ServiceDetail
+	RWLock       sync.RWMutex
+	DCLock       sync.Once
+	InitErr      error
+
 	serviceOperator       *dao.ServiceOperator
 	protocolRuleOperator  *dao.ProtocolRuleOperator
 	loadBalanceOperator   *dao.LoadBalanceOperator
@@ -24,6 +32,12 @@ type SvcService struct {
 
 func NewSvcService() *SvcService {
 	service := &SvcService{
+		ServiceMap:   map[string]*po.ServiceDetail{},
+		ServiceSlice: []*po.ServiceDetail{},
+		RWLock:       sync.RWMutex{},
+		DCLock:       sync.Once{},
+		InitErr:      nil,
+
 		serviceOperator:       dao.NewServiceOperator(),
 		protocolRuleOperator:  dao.NewProtocolRuleOperator(),
 		loadBalanceOperator:   dao.NewLoadBalanceOperator(),
@@ -37,6 +51,86 @@ func GetSvcService() *SvcService {
 		svcService = NewSvcService()
 	}
 	return svcService
+}
+
+func (s *SvcService) LoadServicesIntoMemory() error {
+	s.DCLock.Do(func() {
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		tx, err := lib.GetGormPool("default")
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		_, services, err := s.serviceOperator.FuzzySearchAndPage(ctx, tx, "", 0, 0)
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		s.RWLock.Lock()
+		defer s.RWLock.Unlock()
+
+		for _, service := range services {
+			serviceDetail, err := s.getServiceDetail(ctx, tx, service.Id)
+			if err != nil {
+				s.InitErr = err
+				return
+			}
+			s.ServiceMap[service.ServiceName] = serviceDetail
+			s.ServiceSlice = append(s.ServiceSlice, serviceDetail)
+		}
+	})
+
+	return s.InitErr
+}
+
+func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail, error) {
+	path := ctx.Request.URL.Path
+	host := ctx.Request.Host[0:strings.Index(ctx.Request.Host, ":")]
+	httpServices, _, _, err := s.GroupServicesInMemory()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, service := range httpServices {
+		switch service.HttpRule.RuleType {
+		case constants.HttpRuleTypePrefixUrl:
+			if strings.HasPrefix(path, service.HttpRule.Rule) {
+				return service, nil
+			}
+		case constants.HttpRuleTypeDomain:
+			if host == service.HttpRule.Rule {
+				return service, nil
+			}
+		default:
+			return nil, errors.New(fmt.Sprintf("no such http rule type: %d", service.HttpRule.RuleType))
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("no matched service for path %s and host %s", path, host))
+}
+
+func (s *SvcService) GroupServicesInMemory() ([]*po.ServiceDetail, []*po.ServiceDetail, []*po.ServiceDetail, error) {
+	var httpServices []*po.ServiceDetail
+	var tcpServices []*po.ServiceDetail
+	var grpcServices []*po.ServiceDetail
+
+	for _, service := range s.ServiceSlice {
+		tmp := service
+		switch tmp.Info.ServiceType {
+		case constants.ServiceTypeHttp:
+			httpServices = append(httpServices, tmp)
+		case constants.ServiceTypeTcp:
+			tcpServices = append(tcpServices, tmp)
+		case constants.ServiceTypeGrpc:
+			grpcServices = append(grpcServices, tmp)
+		default:
+			return nil, nil, nil, errors.New(fmt.Sprintf("no such service type: %d", tmp.Info.ServiceType))
+		}
+	}
+
+	return httpServices, tcpServices, grpcServices, nil
 }
 
 func (s *SvcService) ListServices(ctx *gin.Context, tx *gorm.DB, req *dto.ListServicesReq) (int64, []dto.ListServiceItem, error) {
