@@ -19,6 +19,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		http_proxy_middleware.HttpProxyAccessMiddleware(),
+		http_proxy_middleware.HttpRouteRewriteMiddleware(),
 		http_proxy_middleware.HttpReverseProxyMiddleware(),
 	}
 	router.Use(commonMiddlewares...)
