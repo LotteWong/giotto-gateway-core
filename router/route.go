@@ -74,6 +74,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		sessions.Sessions("gateway_session", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
+		middleware.IpAuthMiddleware(),
 		middleware.TranslationMiddleware(),
 	}
 	enableRateLimiter := lib.GetBoolConf("base.rate_limiter.enable")

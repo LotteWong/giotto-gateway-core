@@ -9,8 +9,11 @@
     read_timeout = 10                   # 读取超时时长
     write_timeout = 10                  # 写入超时时长
     max_header_bytes = 20               # 最大的header大小，二进制位长度
-    allow_ip = [                        # 白名单ip列表
+    allow_ips = [                        # 白名单ip列表
         "127.0.0.1"
+    ]
+    block_ips = [                        # 黑名单ip列表
+        "127.0.0.2"
     ]
 
 [cluster]
