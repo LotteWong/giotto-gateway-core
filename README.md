@@ -19,4 +19,6 @@ A powerful golang microservice api gateway.
 - [ ] Migrate Schemas
 - [ ] Websocket Proxy Server
 - [ ] Improve Configs
+- [ ] Improve Dao
 - [ ] Generate Secrets
+- [ ] App Flow Count

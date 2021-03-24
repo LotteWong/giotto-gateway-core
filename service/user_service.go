@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/dao"
+	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/utils"
@@ -17,12 +17,12 @@ import (
 var userService *UserService
 
 type UserService struct {
-	userOperator *dao.UserOperator
+	userOperator *mysql.UserOperator
 }
 
 func NewUserService() *UserService {
 	service := &UserService{
-		userOperator: dao.NewUserOperator(),
+		userOperator: mysql.NewUserOperator(),
 	}
 	return service
 }

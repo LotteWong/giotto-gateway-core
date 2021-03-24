@@ -73,7 +73,7 @@ func (lb *ConsistentHashLb) Add(params ...string) error {
 }
 
 func (lb *ConsistentHashLb) Rmv(params ...string) error {
-	// TODO
+	// TODO: remove hash node from hash ring
 	return nil
 }
 

@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/dao"
+	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/e421083458/golang_common/lib"
@@ -24,10 +24,10 @@ type SvcService struct {
 	DCLock       sync.Once
 	InitErr      error
 
-	serviceOperator       *dao.ServiceOperator
-	protocolRuleOperator  *dao.ProtocolRuleOperator
-	loadBalanceOperator   *dao.LoadBalanceOperator
-	accessControlOperator *dao.AccessControlOperator
+	serviceOperator       *mysql.ServiceOperator
+	protocolRuleOperator  *mysql.ProtocolRuleOperator
+	loadBalanceOperator   *mysql.LoadBalanceOperator
+	accessControlOperator *mysql.AccessControlOperator
 }
 
 func NewSvcService() *SvcService {
@@ -38,10 +38,10 @@ func NewSvcService() *SvcService {
 		DCLock:       sync.Once{},
 		InitErr:      nil,
 
-		serviceOperator:       dao.NewServiceOperator(),
-		protocolRuleOperator:  dao.NewProtocolRuleOperator(),
-		loadBalanceOperator:   dao.NewLoadBalanceOperator(),
-		accessControlOperator: dao.NewAccessControlOperator(),
+		serviceOperator:       mysql.NewServiceOperator(),
+		protocolRuleOperator:  mysql.NewProtocolRuleOperator(),
+		loadBalanceOperator:   mysql.NewLoadBalanceOperator(),
+		accessControlOperator: mysql.NewAccessControlOperator(),
 	}
 	return service
 }
@@ -146,14 +146,19 @@ func (s *SvcService) ListServices(ctx *gin.Context, tx *gorm.DB, req *dto.ListSe
 			return 0, nil, errors.New(fmt.Sprintf("failed to get service detail of %s, err: %v", serviceInfoItem.ServiceName, err))
 		}
 
+		count, err := GetFlowCountService().GetFlowCount(constants.ServiceFlowCountPrefix + serviceInfoItem.ServiceName)
+		if err != nil {
+			return 0, nil, errors.New(fmt.Sprintf("failed to get service flow count of %s, err: %v", serviceInfoItem.ServiceName, err))
+		}
+
 		serviceItem := dto.ListServiceItem{
 			Id:          serviceInfoItem.Id,
 			ServiceName: serviceInfoItem.ServiceName,
 			ServiceDesc: serviceInfoItem.ServiceDesc,
 			ServiceType: serviceInfoItem.ServiceType,
 			ServiceAddr: s.concatServiceAddr(serviceDetail),
-			Qps:         0, // TODO
-			Qpd:         0, // TODO
+			RealQps:     count.Qps,
+			RealQpd:     count.TotalCount,
 			TotalNode:   len(serviceDetail.LoadBalance.GetEnabledIpList()),
 		}
 		serviceItems = append(serviceItems, serviceItem)

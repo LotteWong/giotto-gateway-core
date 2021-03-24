@@ -22,8 +22,8 @@ type ListServiceItem struct {
 	ServiceDesc string `json:"service_desc" form:"service_desc"`
 	ServiceType int    `json:"service_type" form:"service_type"`
 	ServiceAddr string `json:"service_addr" form:"service_addr"`
-	Qps         int64  `json:"qps" form:"qps"`
-	Qpd         int64  `json:"qpd" form:"qpd"`
+	RealQps     int64  `json:"real_qps" form:"real_qps"`
+	RealQpd     int64  `json:"real_qpd" form:"real_qpd"`
 	TotalNode   int    `json:"total_node" form:"total_node"`
 }
 
@@ -46,8 +46,8 @@ type CreateOrUpdateHttpServiceReq struct {
 	OpenAuth             int    `json:"open_auth" form:"open_auth" comment:"是否开启权限" example:"" validate:"max=1,min=0"`                        // 是否开启权限
 	BlackList            string `json:"black_list" form:"black_list" comment:"黑名单ip" example:"" validate:""`                                  // 黑名单ip列表
 	WhiteList            string `json:"white_list" form:"white_list" comment:"白名单ip" example:"" validate:""`                                  // 白名单ip列表
-	ClientIpFlowLimit    int    `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
-	ServiceHostFlowLimit int    `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
+	ClientIpFlowLimit    int64  `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
+	ServiceHostFlowLimit int64  `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
 
 	RoundType              int    `json:"round_type" form:"round_type" comment:"轮询方式" example:"" validate:"max=3,min=0"`                                   // 轮询方式
 	IpList                 string `json:"ip_list" form:"ip_list" comment:"ip列表" example:"" validate:"required,valid_ip_port_list"`                         // ip列表
@@ -71,8 +71,8 @@ type CreateOrUpdateTcpServiceReq struct {
 	BlackList            string `json:"black_list" form:"black_list" comment:"黑名单ip" example:"" validate:"valid_ip_list"`                     // 黑名单ip列表
 	WhiteList            string `json:"white_list" form:"white_list" comment:"白名单ip" example:"" validate:"valid_ip_list"`                     // 白名单ip列表
 	WhiteHostName        string `json:"white_host_name" form:"white_host_name" comment:"白名单主机列表" validate:"valid_ip_list"`                    // 白名单主机列表
-	ClientIpFlowLimit    int    `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
-	ServiceHostFlowLimit int    `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
+	ClientIpFlowLimit    int64  `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
+	ServiceHostFlowLimit int64  `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
 
 	RoundType  int    `json:"round_type" form:"round_type" comment:"轮询方式" example:"" validate:"max=3,min=0"`                  // 轮询方式
 	IpList     string `json:"ip_list" form:"ip_list" comment:"ip列表" example:"" validate:"required,valid_ip_port_list"`        // ip列表
@@ -94,8 +94,8 @@ type CreateOrUpdateGrpcServiceReq struct {
 	BlackList            string `json:"black_list" form:"black_list" comment:"黑名单ip" example:"" validate:"valid_ip_list"`                     // 黑名单ip列表
 	WhiteList            string `json:"white_list" form:"white_list" comment:"白名单ip" example:"" validate:"valid_ip_list"`                     // 白名单ip列表
 	WhiteHostName        string `json:"white_host_name" form:"white_host_name" comment:"白名单主机列表" validate:"valid_ip_list"`                    // 白名单主机列表
-	ClientIpFlowLimit    int    `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
-	ServiceHostFlowLimit int    `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
+	ClientIpFlowLimit    int64  `json:"client_ip_flow_limit" form:"client_ip_flow_limit" comment:"客户端ip限流	" example:"" validate:"min=0"`      // 客户端ip限流
+	ServiceHostFlowLimit int64  `json:"service_host_flow_limit" form:"service_host_flow_limit" comment:"服务端主机限流" example:"" validate:"min=0"` // 服务端主机限流
 
 	RoundType  int    `json:"round_type" form:"round_type" comment:"轮询方式" example:"" validate:"max=3,min=0"`                  // 轮询方式
 	IpList     string `json:"ip_list" form:"ip_list" comment:"ip列表" example:"" validate:"required,valid_ip_port_list"`        // ip列表

@@ -24,8 +24,8 @@ type ListAppItem struct {
 	WhiteIps string `json:"white_ips" form:"white_ips" comment:"ip白名单，支持前缀匹配" validate:""`
 	Qpd      int64  `json:"qpd" form:"qpd" comment:"每日请求量限制" validate:""`
 	Qps      int64  `json:"qps" form:"qps" comment:"每秒请求量限制" validate:""`
-	RealQpd  int64  `json:"qpd" form:"qpd" comment:"每日实际请求量" validate:""`
-	RealQps  int64  `json:"qps" form:"qps" comment:"每秒实际请求量" validate:""`
+	RealQpd  int64  `json:"real_qpd" form:"real_qpd" comment:"每日实际请求量" validate:""`
+	RealQps  int64  `json:"real_qps" form:"real_qps" comment:"每秒实际请求量" validate:""`
 }
 
 func (params *ListAppsReq) BindAndValidListAppsReq(ctx *gin.Context) error {
