@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/dao"
+	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
@@ -13,12 +13,12 @@ import (
 var dashboardService *DashboardService
 
 type DashboardService struct {
-	serviceOperator *dao.ServiceOperator
+	serviceOperator *mysql.ServiceOperator
 }
 
 func NewDashboardService() *DashboardService {
 	service := &DashboardService{
-		serviceOperator: dao.NewServiceOperator(),
+		serviceOperator: mysql.NewServiceOperator(),
 	}
 	return service
 }

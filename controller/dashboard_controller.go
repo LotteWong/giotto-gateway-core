@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
@@ -48,11 +49,17 @@ func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 		return
 	}
 
+	flowCount, err := service.GetFlowCountService().GetFlowCount(constants.TotalFlowCountPrefix)
+	if err != nil {
+		middleware.ResponseError(ctx, 5003, err)
+		return
+	}
+
 	res := &dto.Statistics{
 		ServiceCount: serviceCount,
 		AppCount:     appCount,
-		CurrentQpd:   0, // TODO
-		CurrentQps:   0, // TODO
+		CurrentQpd:   flowCount.TotalCount,
+		CurrentQps:   flowCount.Qps,
 	}
 	middleware.ResponseSuccess(ctx, res)
 }
@@ -90,13 +97,26 @@ func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 // @Success 200 {object} middleware.Response{data=dto.Flow} "success"
 // @Router /flow [get]
 func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
-	var todayFlow []int64
-	var yesterdayFlow []int64
-	for i := 0; i <= time.Now().Hour(); i++ {
-		todayFlow = append(todayFlow, 0)
+	count, err := service.GetFlowCountService().GetFlowCount(constants.TotalFlowCountPrefix)
+	if err != nil {
+		middleware.ResponseError(ctx, 5000, err)
+		return
 	}
+
+	var todayFlow []int64
+	todayTime := time.Now()
+	for i := 0; i <= todayTime.Hour(); i++ {
+		dateTime := time.Date(todayTime.Year(), todayTime.Month(), todayTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourFlow, _ := service.GetFlowCountService().GetHourFlow(dateTime, count.ServiceName)
+		todayFlow = append(todayFlow, hourFlow)
+	}
+
+	var yesterdayFlow []int64
+	yeasterdayTime := todayTime.Add(-1 * 24 * time.Hour)
 	for i := 0; i <= 23; i++ {
-		yesterdayFlow = append(yesterdayFlow, 0)
+		dateTime := time.Date(yeasterdayTime.Year(), yeasterdayTime.Month(), yeasterdayTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourFlow, _ := service.GetFlowCountService().GetHourFlow(dateTime, count.ServiceName)
+		yesterdayFlow = append(yesterdayFlow, hourFlow)
 	}
 
 	res := &dto.Flow{
@@ -116,19 +136,43 @@ func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 // @Success 200 {object} middleware.Response{data=dto.Flow} "success"
 // @Router /flow/services/{service_id} [get]
 func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
-	_, err := strconv.Atoi(ctx.Param("service_id"))
+	service_id, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		middleware.ResponseError(ctx, 5000, err)
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 5001, err)
+		return
+	}
+	serviceDetail, err := service.GetSvcService().ShowService(ctx, tx, int64(service_id))
+	if err != nil {
+		middleware.ResponseError(ctx, 5002, err)
+		return
+	}
+
+	count, err := service.GetFlowCountService().GetFlowCount(constants.ServiceFlowCountPrefix + serviceDetail.Info.ServiceName)
+	if err != nil {
+		middleware.ResponseError(ctx, 5003, err)
 		return
 	}
 
 	var todayFlow []int64
-	var yesterdayFlow []int64
-	for i := 0; i <= time.Now().Hour(); i++ {
-		todayFlow = append(todayFlow, 0)
+	todayTime := time.Now()
+	for i := 0; i <= todayTime.Hour(); i++ {
+		dateTime := time.Date(todayTime.Year(), todayTime.Month(), todayTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourFlow, _ := service.GetFlowCountService().GetHourFlow(dateTime, count.ServiceName)
+		todayFlow = append(todayFlow, hourFlow)
 	}
+
+	var yesterdayFlow []int64
+	yesterdayTime := todayTime.Add(-1 * 24 * time.Hour)
 	for i := 0; i <= 23; i++ {
-		yesterdayFlow = append(yesterdayFlow, 0)
+		dateTime := time.Date(yesterdayTime.Year(), yesterdayTime.Month(), yesterdayTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourFlow, _ := service.GetFlowCountService().GetHourFlow(dateTime, count.ServiceName)
+		yesterdayFlow = append(yesterdayFlow, hourFlow)
 	}
 
 	res := &dto.Flow{
@@ -148,19 +192,43 @@ func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 // @Success 200 {object} middleware.Response{data=dto.Flow} "success"
 // @Router /flow/apps/{app_id} [get]
 func (c *DashboardController) GetAppFlow(ctx *gin.Context) {
-	_, err := strconv.Atoi(ctx.Param("app_id"))
+	appId, err := strconv.Atoi(ctx.Param("app_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 4000, err)
+		middleware.ResponseError(ctx, 5000, err)
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 5001, err)
+		return
+	}
+	app, err := service.GetAppService().ShowApp(ctx, tx, int64(appId))
+	if err != nil {
+		middleware.ResponseError(ctx, 5002, err)
+		return
+	}
+
+	count, err := service.GetFlowCountService().GetFlowCount(constants.AppFlowCountPrefix + app.AppId)
+	if err != nil {
+		middleware.ResponseError(ctx, 5003, err)
 		return
 	}
 
 	var todayFlow []int64
-	var yesterdayFlow []int64
-	for i := 0; i <= time.Now().Hour(); i++ {
-		todayFlow = append(todayFlow, 0)
+	todayTime := time.Now()
+	for i := 0; i <= todayTime.Hour(); i++ {
+		dateTime := time.Date(todayTime.Year(), todayTime.Month(), todayTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourFlow, _ := service.GetFlowCountService().GetHourFlow(dateTime, count.ServiceName)
+		todayFlow = append(todayFlow, hourFlow)
 	}
+
+	var yesterdayFlow []int64
+	yesterdayTime := todayTime.Add(-1 * 24 * time.Hour)
 	for i := 0; i <= 23; i++ {
-		yesterdayFlow = append(yesterdayFlow, 0)
+		dateTime := time.Date(yesterdayTime.Year(), yesterdayTime.Month(), yesterdayTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourFlow, _ := service.GetFlowCountService().GetHourFlow(dateTime, count.ServiceName)
+		yesterdayFlow = append(yesterdayFlow, hourFlow)
 	}
 
 	res := &dto.Flow{

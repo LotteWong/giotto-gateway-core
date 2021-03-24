@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/dao"
+	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/load_balance"
 	"github.com/LotteWong/giotto-gateway/load_balance/lb_conf"
 	"github.com/LotteWong/giotto-gateway/models/po"
@@ -18,7 +18,7 @@ type LbService struct {
 	LoadBalanceSlice []*po.LoadBalanceDetail
 	RWLock           sync.RWMutex
 
-	loadBalanceOperator *dao.LoadBalanceOperator
+	loadBalanceOperator *mysql.LoadBalanceOperator
 }
 
 func NewLbService() *LbService {
@@ -26,7 +26,7 @@ func NewLbService() *LbService {
 		LoadBalanceMap:      map[string]*po.LoadBalanceDetail{},
 		LoadBalanceSlice:    []*po.LoadBalanceDetail{},
 		RWLock:              sync.RWMutex{},
-		loadBalanceOperator: dao.NewLoadBalanceOperator(),
+		loadBalanceOperator: mysql.NewLoadBalanceOperator(),
 	}
 	return service
 }

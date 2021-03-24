@@ -2,7 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/LotteWong/giotto-gateway/dao"
+	"github.com/LotteWong/giotto-gateway/constants"
+	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/utils"
@@ -14,12 +15,12 @@ import (
 var appService *AppService
 
 type AppService struct {
-	appOperatpr *dao.AppOperator
+	appOperatpr *mysql.AppOperator
 }
 
 func NewAppService() *AppService {
 	service := &AppService{
-		appOperatpr: dao.NewAppOperator(),
+		appOperatpr: mysql.NewAppOperator(),
 	}
 	return service
 }
@@ -39,6 +40,11 @@ func (s *AppService) ListApps(ctx *gin.Context, tx *gorm.DB, req *dto.ListAppsRe
 
 	var appItems []dto.ListAppItem
 	for _, item := range items {
+		count, err := GetFlowCountService().GetFlowCount(constants.AppFlowCountPrefix + item.AppId)
+		if err != nil {
+			return 0, nil, errors.New(fmt.Sprintf("failed to get app flow count of %s, err: %v", item.AppId, err))
+		}
+
 		appItem := dto.ListAppItem{
 			Id:       item.Id,
 			AppId:    item.AppId,
@@ -47,8 +53,8 @@ func (s *AppService) ListApps(ctx *gin.Context, tx *gorm.DB, req *dto.ListAppsRe
 			WhiteIps: item.WhiteIps,
 			Qpd:      item.Qpd,
 			Qps:      item.Qps,
-			RealQpd:  0, // TODO
-			RealQps:  0, // TODO
+			RealQpd:  count.TotalCount,
+			RealQps:  count.Qps,
 		}
 		appItems = append(appItems, appItem)
 	}
