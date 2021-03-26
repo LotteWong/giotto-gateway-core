@@ -21,6 +21,14 @@ func HttpRateLimitMiddleware() gin.HandlerFunc {
 		}
 		httpServiceDetail := httpServiceInterface.(*po.ServiceDetail)
 
+		appInterface, ok := c.Get("app")
+		if !ok {
+			middleware.ResponseError(c, http.StatusInternalServerError, errors.New("app not found"))
+			c.Abort()
+			return
+		}
+		app := appInterface.(*po.App)
+
 		if httpServiceDetail.AccessControl.ServiceHostFlowLimit != 0 {
 			svrServiceName := constants.ServiceFlowCountPrefix + httpServiceDetail.Info.ServiceName
 			svrRateLimit, err := service.GetRateLimitService().GetRateLimit(svrServiceName, httpServiceDetail.AccessControl.ServiceHostFlowLimit)
@@ -46,6 +54,21 @@ func HttpRateLimitMiddleware() gin.HandlerFunc {
 			}
 			if !cltRateLimit.Allow() {
 				middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("client ip flow limit is %d, rate limit exceeds", httpServiceDetail.AccessControl.ClientIpFlowLimit)))
+				c.Abort()
+				return
+			}
+		}
+
+		if app.Qps != 0 {
+			appServiceName := constants.AppFlowCountPrefix + app.AppId
+			appRateLimit, err := service.GetRateLimitService().GetRateLimit(appServiceName, app.Qps)
+			if err != nil {
+				middleware.ResponseError(c, http.StatusInternalServerError, err)
+				c.Abort()
+				return
+			}
+			if !appRateLimit.Allow() {
+				middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("app flow limit is %d, rate limit exceeds", app.Qps)))
 				c.Abort()
 				return
 			}

@@ -6,6 +6,7 @@ require (
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/e421083458/golang_common v1.0.3
 	github.com/e421083458/gorm v1.0.1
 	github.com/garyburd/redigo v1.6.0

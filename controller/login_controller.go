@@ -14,7 +14,6 @@ func RegistLoginRoutes(grp *gin.RouterGroup) {
 	controller := &LoginController{}
 	grp.POST("/login", controller.Login)
 	grp.POST("/logout", controller.Logout)
-
 }
 
 // Login godoc
