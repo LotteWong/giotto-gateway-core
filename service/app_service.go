@@ -7,20 +7,34 @@ import (
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/utils"
+	"github.com/e421083458/golang_common/lib"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"net/http/httptest"
+	"sync"
 )
 
 var appService *AppService
 
 type AppService struct {
-	appOperatpr *mysql.AppOperator
+	AppMap   map[string]*po.App
+	AppSlice []*po.App
+	RWLock   sync.RWMutex
+	DCLock   sync.Once
+	InitErr  error
+
+	appOperator *mysql.AppOperator
 }
 
 func NewAppService() *AppService {
 	service := &AppService{
-		appOperatpr: mysql.NewAppOperator(),
+		AppMap:      map[string]*po.App{},
+		AppSlice:    []*po.App{},
+		RWLock:      sync.RWMutex{},
+		DCLock:      sync.Once{},
+		InitErr:     nil,
+		appOperator: mysql.NewAppOperator(),
 	}
 	return service
 }
@@ -32,8 +46,40 @@ func GetAppService() *AppService {
 	return appService
 }
 
+func (s *AppService) LoadAppsIntoMemory() error {
+	s.DCLock.Do(func() {
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		tx, err := lib.GetGormPool("default")
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		_, apps, err := s.appOperator.FuzzySearchAndPage(ctx, tx, "", 0, 0)
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		s.RWLock.Lock()
+		defer s.RWLock.Unlock()
+
+		for _, app := range apps {
+			tmp := app
+			s.AppMap[tmp.AppId] = &tmp
+			s.AppSlice = append(s.AppSlice, &tmp)
+		}
+	})
+
+	return s.InitErr
+}
+
+func (s *AppService) ListAppsInMemory() []*po.App {
+	return s.AppSlice
+}
+
 func (s *AppService) ListApps(ctx *gin.Context, tx *gorm.DB, req *dto.ListAppsReq) (int64, []dto.ListAppItem, error) {
-	total, items, err := s.appOperatpr.FuzzySearchAndPage(ctx, tx, req.Keyword, req.PageIndex, req.PageSize)
+	total, items, err := s.appOperator.FuzzySearchAndPage(ctx, tx, req.Keyword, req.PageIndex, req.PageSize)
 	if err != nil {
 		return 0, nil, errors.New(fmt.Sprintf("failed to page apps with condition %v, err: %v", req, err))
 	}
@@ -63,7 +109,7 @@ func (s *AppService) ListApps(ctx *gin.Context, tx *gorm.DB, req *dto.ListAppsRe
 }
 
 func (s *AppService) ShowApp(ctx *gin.Context, tx *gorm.DB, AppId int64) (*po.App, error) {
-	app, err := s.appOperatpr.Find(ctx, tx, &po.App{Id: AppId})
+	app, err := s.appOperator.Find(ctx, tx, &po.App{Id: AppId})
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +132,7 @@ func (s *AppService) CreateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrU
 		Qps:      req.Qps,
 		Qpd:      req.Qpd,
 	}
-	if err := s.appOperatpr.Save(ctx, tx, app); err != nil {
+	if err := s.appOperator.Save(ctx, tx, app); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -104,7 +150,7 @@ func (s *AppService) UpdateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrU
 
 	tx = tx.Begin()
 
-	app, err := s.appOperatpr.Find(ctx, tx, &po.App{Id: appId})
+	app, err := s.appOperator.Find(ctx, tx, &po.App{Id: appId})
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -115,7 +161,7 @@ func (s *AppService) UpdateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrU
 	app.WhiteIps = req.WhiteIps
 	app.Qpd = req.Qpd
 	app.Qps = req.Qps
-	if err := s.appOperatpr.Save(ctx, tx, app); err != nil {
+	if err := s.appOperator.Save(ctx, tx, app); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -126,13 +172,13 @@ func (s *AppService) UpdateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrU
 }
 
 func (s *AppService) DeleteApp(ctx *gin.Context, tx *gorm.DB, appId int64) error {
-	app, err := s.appOperatpr.Find(ctx, tx, &po.App{Id: appId})
+	app, err := s.appOperator.Find(ctx, tx, &po.App{Id: appId})
 	if err != nil {
 		return err
 	}
 
 	app.IsDelete = 1
-	err = s.appOperatpr.Save(ctx, tx, app)
+	err = s.appOperator.Save(ctx, tx, app)
 	if err != nil {
 		return err
 	}
@@ -142,7 +188,7 @@ func (s *AppService) DeleteApp(ctx *gin.Context, tx *gorm.DB, appId int64) error
 
 func (s *AppService) validCreateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrUpdateAppReq) error {
 	// check whether service name is duplicated
-	if _, err := s.appOperatpr.Find(ctx, tx, &po.App{AppId: req.AppId}); err == nil {
+	if _, err := s.appOperator.Find(ctx, tx, &po.App{AppId: req.AppId}); err == nil {
 		return errors.New(fmt.Sprintf("app id %s is duplicated", req.AppId))
 	}
 

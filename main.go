@@ -50,7 +50,8 @@ func InitManagementServer(config string) {
 func InitProxyServer(config string) {
 	lib.InitModule(config, []string{"base", "mysql", "redis"})
 	defer lib.Destroy()
-	service.GetSvcService().LoadServicesIntoMemory()
+	_ = service.GetSvcService().LoadServicesIntoMemory()
+	_ = service.GetAppService().LoadAppsIntoMemory()
 
 	go func() {
 		http_proxy_router.HttpServerRun()

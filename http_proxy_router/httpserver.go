@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -16,7 +17,10 @@ var (
 
 func HttpServerRun() {
 	gin.SetMode(lib.GetStringConf("proxy.base.debug_mode"))
-	r := InitRouter()
+	r := InitRouter(
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+	)
 	HttpSrvHandler = &http.Server{
 		Addr:           lib.GetStringConf("proxy.http.addr"),
 		Handler:        r,
@@ -41,7 +45,10 @@ func HttpServerStop() {
 
 func HttpsServerRun() {
 	gin.SetMode(lib.GetStringConf("proxy.base.debug_mode"))
-	r := InitRouter()
+	r := InitRouter(
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+	)
 	HttpsSrvHandler = &http.Server{
 		Addr:           lib.GetStringConf("proxy.https.addr"),
 		Handler:        r,

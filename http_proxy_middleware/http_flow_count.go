@@ -1,6 +1,7 @@
 package http_proxy_middleware
 
 import (
+	"fmt"
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/LotteWong/giotto-gateway/models/po"
@@ -20,6 +21,14 @@ func HttpFlowCountMiddleware() gin.HandlerFunc {
 		}
 		httpServiceDetail := httpServiceInterface.(*po.ServiceDetail)
 
+		appInterface, ok := c.Get("app")
+		if !ok {
+			middleware.ResponseError(c, http.StatusInternalServerError, errors.New("app not found"))
+			c.Abort()
+			return
+		}
+		app := appInterface.(*po.App)
+
 		ttlServiceName := constants.TotalFlowCountPrefix
 		ttlFlowCount, err := service.GetFlowCountService().GetFlowCount(ttlServiceName)
 		if err != nil {
@@ -37,6 +46,20 @@ func HttpFlowCountMiddleware() gin.HandlerFunc {
 			return
 		}
 		service.GetFlowCountService().Increase(svcFlowCount)
+
+		appServiceName := constants.AppFlowCountPrefix + app.AppId
+		appFlowCount, err := service.GetFlowCountService().GetFlowCount(appServiceName)
+		if err != nil {
+			middleware.ResponseError(c, http.StatusInternalServerError, err)
+			c.Abort()
+			return
+		}
+		service.GetFlowCountService().Increase(appFlowCount)
+		if app.Qpd > 0 && appFlowCount.TotalCount > app.Qpd {
+			middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("app's qpd exceeds limit, current: %d, limit: %d", appFlowCount.TotalCount, app.Qpd)))
+			c.Abort()
+			return
+		}
 
 		c.Next()
 	}
