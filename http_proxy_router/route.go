@@ -1,9 +1,9 @@
 package router
 
 import (
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/controller"
 	"github.com/LotteWong/giotto-gateway/http_proxy_middleware"
-	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +18,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	// jwt api routes
 	jwtGroup := router.Group("/tokens")
-	jwtGroup.Use(middleware.TranslationMiddleware())
+	jwtGroup.Use(common_middleware.TranslationMiddleware())
 	{
 		// Post    /tokens/jwt
 		controller.RegistJwtRoutes(jwtGroup)

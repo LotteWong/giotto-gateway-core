@@ -1,4 +1,4 @@
-package middleware
+package common_middleware
 
 import (
 	"github.com/LotteWong/giotto-gateway/constants"

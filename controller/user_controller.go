@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
@@ -22,16 +22,16 @@ func RegistUserRoutes(grp *gin.RouterGroup) {
 // @Tags 用户接口
 // @Id /users/admin
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=dto.UserInfo} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.UserInfo} "success"
 // @Router /users/admin [get]
 func (c *UserController) GetUserInfo(ctx *gin.Context) {
 	userInfo, err := service.GetUserService().GetUserInfo(ctx)
 	if err != nil {
-		middleware.ResponseError(ctx, 2000, err)
+		common_middleware.ResponseError(ctx, 2000, err)
 		return
 	}
 
-	middleware.ResponseSuccess(ctx, userInfo)
+	common_middleware.ResponseSuccess(ctx, userInfo)
 }
 
 // ChangeUserPwd godoc
@@ -42,27 +42,27 @@ func (c *UserController) GetUserInfo(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.ChangeUserPwdReq true "change user password request body"
-// @Success 200 {object} middleware.Response{data=string} "success"
+// @Success 200 {object} management_middleware.Response{data=string} "success"
 // @Router /users/admin [POST]
 func (c *UserController) ChangeUserPwd(ctx *gin.Context) {
 	// validate request params
 	req := &dto.ChangeUserPwdReq{}
 	if err := req.BindAndValidChangeUserPwdReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 2000, err)
+		common_middleware.ResponseError(ctx, 2000, err)
 		return
 	}
 
 	// change user password business logic
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 2001, err)
+		common_middleware.ResponseError(ctx, 2001, err)
 		return
 	}
 	if err := service.GetUserService().ChangeUserPassword(ctx, tx, req); err != nil {
-		middleware.ResponseError(ctx, 2002, err)
+		common_middleware.ResponseError(ctx, 2002, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, "")
+	common_middleware.ResponseSuccess(ctx, "")
 }

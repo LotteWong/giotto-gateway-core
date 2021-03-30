@@ -1,8 +1,8 @@
 package reverse_proxy
 
 import (
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/LotteWong/giotto-gateway/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -49,7 +49,7 @@ func NewReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *http.
 
 	// handle when error occurs
 	errFunc := func(w http.ResponseWriter, r *http.Request, err error) {
-		middleware.ResponseError(ctx, http.StatusInternalServerError, err)
+		common_middleware.ResponseError(ctx, http.StatusInternalServerError, err)
 	}
 
 	return &httputil.ReverseProxy{

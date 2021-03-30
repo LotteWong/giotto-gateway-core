@@ -1,7 +1,8 @@
-package middleware
+package management_middleware
 
 import (
 	"fmt"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -39,9 +40,9 @@ func IpAuthMiddleware() gin.HandlerFunc {
 		if !isMatched {
 			switch authMode {
 			case "allow":
-				ResponseError(c, InternalErrorCode, errors.New(fmt.Sprintf("ip %s not in allow ip list", c.ClientIP())))
+				common_middleware.ResponseError(c, common_middleware.InternalErrorCode, errors.New(fmt.Sprintf("ip %s not in allow ip list", c.ClientIP())))
 			case "block":
-				ResponseError(c, InternalErrorCode, errors.New(fmt.Sprintf("ip %s is in block ip list", c.ClientIP())))
+				common_middleware.ResponseError(c, common_middleware.InternalErrorCode, errors.New(fmt.Sprintf("ip %s is in block ip list", c.ClientIP())))
 			}
 			c.Abort()
 			return

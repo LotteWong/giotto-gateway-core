@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
@@ -24,31 +24,31 @@ func RegistLoginRoutes(grp *gin.RouterGroup) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.LoginReq true "login request body"
-// @Success 200 {object} middleware.Response{data=dto.LoginRes} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.LoginRes} "success"
 // @Router /login [post]
 func (c *LoginController) Login(ctx *gin.Context) {
 	// validate request params
 	req := &dto.LoginReq{}
 	if err := req.BindAndValidLoginReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 1000, err)
+		common_middleware.ResponseError(ctx, 1000, err)
 		return
 	}
 
 	// login business logic
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 1001, err)
+		common_middleware.ResponseError(ctx, 1001, err)
 		return
 	}
 	user, err := service.GetLoginService().Login(ctx, tx, req)
 	if err != nil {
-		middleware.ResponseError(ctx, 1002, err)
+		common_middleware.ResponseError(ctx, 1002, err)
 		return
 	}
 
 	// return response body
 	res := &dto.LoginRes{Token: user.Username}
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // Logout godoc
@@ -57,13 +57,13 @@ func (c *LoginController) Login(ctx *gin.Context) {
 // @Tags 登录接口
 // @Id /logout
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=string} "success"
+// @Success 200 {object} management_middleware.Response{data=string} "success"
 // @Router /logout [post]
 func (c *LoginController) Logout(ctx *gin.Context) {
 	if err := service.GetLoginService().Logout(ctx); err != nil {
-		middleware.ResponseError(ctx, 1000, err)
+		common_middleware.ResponseError(ctx, 1000, err)
 		return
 	}
 
-	middleware.ResponseSuccess(ctx, "")
+	common_middleware.ResponseSuccess(ctx, "")
 }

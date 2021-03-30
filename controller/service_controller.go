@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
@@ -33,25 +33,25 @@ func RegistServiceRoutes(grp *gin.RouterGroup) {
 // @Param keyword query string false "keyword"
 // @Param page_index query string false "page index"
 // @Param page_size query string false "page size"
-// @Success 200 {object} middleware.Response{data=dto.ListServicesRes} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.ListServicesRes} "success"
 // @Router /services [get]
 func (c *ServiceController) ListServices(ctx *gin.Context) {
 	// validate request params
 	req := &dto.ListServicesReq{}
 	if err := req.BindAndValidListServicesReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 
 	// fuzzy search and page services
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 	total, items, err := service.GetSvcService().ListServices(ctx, tx, req)
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (c *ServiceController) ListServices(ctx *gin.Context) {
 		Total: total,
 		Items: items,
 	}
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // ShowService godoc
@@ -70,27 +70,27 @@ func (c *ServiceController) ListServices(ctx *gin.Context) {
 // @Id /services/{service_id}
 // @Produce  json
 // @Param service_id path string true "service id"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/{service_id} [get]
 func (c *ServiceController) ShowService(ctx *gin.Context) {
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 	res, err := service.GetSvcService().ShowService(ctx, tx, int64(serviceId))
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // CreateHttpService godoc
@@ -101,30 +101,30 @@ func (c *ServiceController) ShowService(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateHttpServiceReq true "create http service request body"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/http [post]
 func (c *ServiceController) CreateHttpService(ctx *gin.Context) {
 	// validate request params
 	req := &dto.CreateOrUpdateHttpServiceReq{}
 	if err := req.BindAndValidCreateOrUpdateHttpServiceReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 
 	// create http service
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 	res, err := service.GetSvcService().CreateHttpService(ctx, tx, req)
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // UpdateHttpService godoc
@@ -136,35 +136,35 @@ func (c *ServiceController) CreateHttpService(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Param body body dto.CreateOrUpdateHttpServiceReq true "update http service request body"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/http/{service_id} [put]
 func (c *ServiceController) UpdateHttpService(ctx *gin.Context) {
 	// validate request params
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 	req := &dto.CreateOrUpdateHttpServiceReq{}
 	if err := req.BindAndValidCreateOrUpdateHttpServiceReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 
 	// update http service
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 	res, err := service.GetSvcService().UpdateHttpService(ctx, tx, req, int64(serviceId))
 	if err != nil {
-		middleware.ResponseError(ctx, 3003, err)
+		common_middleware.ResponseError(ctx, 3003, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // CreateTcpService godoc
@@ -175,30 +175,30 @@ func (c *ServiceController) UpdateHttpService(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateTcpServiceReq true "create tcp service request body"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/tcp [post]
 func (c *ServiceController) CreateTcpService(ctx *gin.Context) {
 	// validate request params
 	req := &dto.CreateOrUpdateTcpServiceReq{}
 	if err := req.BindAndValidCreateOrUpdateTcpServiceReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 
 	// create http service
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 	res, err := service.GetSvcService().CreateTcpService(ctx, tx, req)
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // UpdateTcpService godoc
@@ -210,35 +210,35 @@ func (c *ServiceController) CreateTcpService(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Param body body dto.CreateOrUpdateTcpServiceReq true "update tcp service request body"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/tcp/{service_id} [put]
 func (c *ServiceController) UpdateTcpService(ctx *gin.Context) {
 	// validate request params
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 	req := &dto.CreateOrUpdateTcpServiceReq{}
 	if err := req.BindAndValidCreateOrUpdateTcpServiceReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 
 	// update http service
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 	res, err := service.GetSvcService().UpdateTcpService(ctx, tx, req, int64(serviceId))
 	if err != nil {
-		middleware.ResponseError(ctx, 3003, err)
+		common_middleware.ResponseError(ctx, 3003, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // CreateGrpcService godoc
@@ -249,30 +249,30 @@ func (c *ServiceController) UpdateTcpService(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateGrpcServiceReq true "create grpc service request body"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/grpc [post]
 func (c *ServiceController) CreateGrpcService(ctx *gin.Context) {
 	// validate request params
 	req := &dto.CreateOrUpdateGrpcServiceReq{}
 	if err := req.BindAndValidCreateOrUpdateGrpcServiceReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 
 	// create http service
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 	res, err := service.GetSvcService().CreateGrpcService(ctx, tx, req)
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // UpdateGrpcService godoc
@@ -284,35 +284,35 @@ func (c *ServiceController) CreateGrpcService(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Param body body dto.CreateOrUpdateGrpcServiceReq true "update grpc service request body"
-// @Success 200 {object} middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/grpc/{service_id} [put]
 func (c *ServiceController) UpdateGrpcService(ctx *gin.Context) {
 	// validate request params
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 	req := &dto.CreateOrUpdateGrpcServiceReq{}
 	if err := req.BindAndValidCreateOrUpdateGrpcServiceReq(ctx); err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 
 	// update http service
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 	res, err := service.GetSvcService().UpdateGrpcService(ctx, tx, req, int64(serviceId))
 	if err != nil {
-		middleware.ResponseError(ctx, 3003, err)
+		common_middleware.ResponseError(ctx, 3003, err)
 		return
 	}
 
 	// return response body
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // DeleteService godoc
@@ -322,25 +322,25 @@ func (c *ServiceController) UpdateGrpcService(ctx *gin.Context) {
 // @Id /services/{service_id}
 // @Produce  json
 // @Param service_id path string true "service id"
-// @Success 200 {object} middleware.Response{data=string} "success"
+// @Success 200 {object} management_middleware.Response{data=string} "success"
 // @Router /services/{service_id} [delete]
 func (c *ServiceController) DeleteService(ctx *gin.Context) {
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 3000, err)
+		common_middleware.ResponseError(ctx, 3000, err)
 		return
 	}
 
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 3001, err)
+		common_middleware.ResponseError(ctx, 3001, err)
 		return
 	}
 	err = service.GetSvcService().DeleteService(ctx, tx, int64(serviceId))
 	if err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+		common_middleware.ResponseError(ctx, 3002, err)
 		return
 	}
 
-	middleware.ResponseSuccess(ctx, "")
+	common_middleware.ResponseSuccess(ctx, "")
 }

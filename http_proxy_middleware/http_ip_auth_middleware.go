@@ -2,8 +2,8 @@ package http_proxy_middleware
 
 import (
 	"fmt"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -15,7 +15,7 @@ func HttpIpAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		httpServiceInterface, ok := c.Get("service")
 		if !ok {
-			middleware.ResponseError(c, http.StatusInternalServerError, errors.New("service not found"))
+			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("service not found"))
 			c.Abort()
 			return
 		}
@@ -36,14 +36,14 @@ func HttpIpAuthMiddleware() gin.HandlerFunc {
 		if openAuth == constants.Enable {
 			if len(whiteIpList) > 0 { // white list has higher priority
 				if !checkStrInSlice(whiteIpList, c.ClientIP()) {
-					middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("ip %s not in white ip list", c.ClientIP())))
+					common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("ip %s not in white ip list", c.ClientIP())))
 					c.Abort()
 					return
 				}
 			} else { // black list has lower priority
 				if len(blackIpList) > 0 {
 					if checkStrInSlice(blackIpList, c.ClientIP()) {
-						middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("ip %s is in black ip list", c.ClientIP())))
+						common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("ip %s is in black ip list", c.ClientIP())))
 						c.Abort()
 						return
 					}
