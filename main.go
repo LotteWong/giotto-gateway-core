@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	http_proxy_router "github.com/LotteWong/giotto-gateway/http_proxy_router"
-	"github.com/LotteWong/giotto-gateway/router"
+	"github.com/LotteWong/giotto-gateway/management_router"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
 	"log"
@@ -38,13 +38,13 @@ func InitManagementServer(config string) {
 	lib.InitModule(config, []string{"base", "mysql", "redis"})
 	defer lib.Destroy()
 
-	router.HttpServerRun()
+	management_router.HttpServerRun()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	router.HttpServerStop()
+	management_router.HttpServerStop()
 }
 
 func InitProxyServer(config string) {

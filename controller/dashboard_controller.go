@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
@@ -28,30 +28,30 @@ func RegistDashboardRoutes(grp *gin.RouterGroup) {
 // @Tags 数据接口
 // @Id /statistics
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=dto.Statistics} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.Statistics} "success"
 // @Router /statistics [get]
 func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 5000, err)
+		common_middleware.ResponseError(ctx, 5000, err)
 		return
 	}
 
 	serviceCount, _, err := service.GetSvcService().ListServices(ctx, tx, &dto.ListServicesReq{})
 	if err != nil {
-		middleware.ResponseError(ctx, 5001, err)
+		common_middleware.ResponseError(ctx, 5001, err)
 		return
 	}
 
 	appCount, _, err := service.GetAppService().ListApps(ctx, tx, &dto.ListAppsReq{})
 	if err != nil {
-		middleware.ResponseError(ctx, 5002, err)
+		common_middleware.ResponseError(ctx, 5002, err)
 		return
 	}
 
 	flowCount, err := service.GetFlowCountService().GetFlowCount(constants.TotalFlowCountPrefix)
 	if err != nil {
-		middleware.ResponseError(ctx, 5003, err)
+		common_middleware.ResponseError(ctx, 5003, err)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 		CurrentQpd:   flowCount.TotalCount,
 		CurrentQps:   flowCount.Qps,
 	}
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // GetServicePercentage godoc
@@ -70,22 +70,22 @@ func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 // @Tags 数据接口
 // @Id /percentage/services
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
 // @Router /percentage/services [get]
 func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 5000, err)
+		common_middleware.ResponseError(ctx, 5000, err)
 		return
 	}
 
 	res, err := service.GetDashboardService().GetServicePercentage(ctx, tx)
 	if err != nil {
-		middleware.ResponseError(ctx, 5001, err)
+		common_middleware.ResponseError(ctx, 5001, err)
 		return
 	}
 
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // GetTotalFlow godoc
@@ -94,12 +94,12 @@ func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 // @Tags 数据接口
 // @Id /flow
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
 // @Router /flow [get]
 func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 	count, err := service.GetFlowCountService().GetFlowCount(constants.TotalFlowCountPrefix)
 	if err != nil {
-		middleware.ResponseError(ctx, 5000, err)
+		common_middleware.ResponseError(ctx, 5000, err)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 		TodayFlow:     todayFlow,
 		YesterdayFlow: yesterdayFlow,
 	}
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // GetServiceFlow godoc
@@ -133,29 +133,29 @@ func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 // @Id /flow/services/{service_id}
 // @Produce  json
 // @Param service_id path string true "service id"
-// @Success 200 {object} middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
 // @Router /flow/services/{service_id} [get]
 func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 	service_id, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 5000, err)
+		common_middleware.ResponseError(ctx, 5000, err)
 		return
 	}
 
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 5001, err)
+		common_middleware.ResponseError(ctx, 5001, err)
 		return
 	}
 	serviceDetail, err := service.GetSvcService().ShowService(ctx, tx, int64(service_id))
 	if err != nil {
-		middleware.ResponseError(ctx, 5002, err)
+		common_middleware.ResponseError(ctx, 5002, err)
 		return
 	}
 
 	count, err := service.GetFlowCountService().GetFlowCount(constants.ServiceFlowCountPrefix + serviceDetail.Info.ServiceName)
 	if err != nil {
-		middleware.ResponseError(ctx, 5003, err)
+		common_middleware.ResponseError(ctx, 5003, err)
 		return
 	}
 
@@ -179,7 +179,7 @@ func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 		TodayFlow:     todayFlow,
 		YesterdayFlow: yesterdayFlow,
 	}
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }
 
 // GetAppFlow godoc
@@ -189,29 +189,29 @@ func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 // @Id /flow/apps/{app_id}
 // @Produce  json
 // @Param app_id path string true "app id"
-// @Success 200 {object} middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
 // @Router /flow/apps/{app_id} [get]
 func (c *DashboardController) GetAppFlow(ctx *gin.Context) {
 	appId, err := strconv.Atoi(ctx.Param("app_id"))
 	if err != nil {
-		middleware.ResponseError(ctx, 5000, err)
+		common_middleware.ResponseError(ctx, 5000, err)
 		return
 	}
 
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
-		middleware.ResponseError(ctx, 5001, err)
+		common_middleware.ResponseError(ctx, 5001, err)
 		return
 	}
 	app, err := service.GetAppService().ShowApp(ctx, tx, int64(appId))
 	if err != nil {
-		middleware.ResponseError(ctx, 5002, err)
+		common_middleware.ResponseError(ctx, 5002, err)
 		return
 	}
 
 	count, err := service.GetFlowCountService().GetFlowCount(constants.AppFlowCountPrefix + app.AppId)
 	if err != nil {
-		middleware.ResponseError(ctx, 5003, err)
+		common_middleware.ResponseError(ctx, 5003, err)
 		return
 	}
 
@@ -235,5 +235,5 @@ func (c *DashboardController) GetAppFlow(ctx *gin.Context) {
 		TodayFlow:     todayFlow,
 		YesterdayFlow: yesterdayFlow,
 	}
-	middleware.ResponseSuccess(ctx, res)
+	common_middleware.ResponseSuccess(ctx, res)
 }

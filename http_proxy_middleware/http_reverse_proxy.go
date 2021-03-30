@@ -1,7 +1,7 @@
 package http_proxy_middleware
 
 import (
-	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/reverse_proxy"
 	"github.com/LotteWong/giotto-gateway/service"
@@ -14,7 +14,7 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		httpServiceInterface, ok := c.Get("service")
 		if !ok {
-			middleware.ResponseError(c, http.StatusInternalServerError, errors.New("service not found"))
+			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("service not found"))
 			c.Abort()
 			return
 		}
@@ -22,13 +22,13 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 
 		lb, err := service.GetLbService().GetLbWithConfForSvc(httpServiceDetail)
 		if err != nil {
-			middleware.ResponseError(c, http.StatusInternalServerError, err)
+			common_middleware.ResponseError(c, http.StatusInternalServerError, err)
 			c.Abort()
 			return
 		}
 		trans, err := service.GetTransService().GetTransForSvc(httpServiceDetail)
 		if err != nil {
-			middleware.ResponseError(c, http.StatusInternalServerError, err)
+			common_middleware.ResponseError(c, http.StatusInternalServerError, err)
 			c.Abort()
 			return
 		}

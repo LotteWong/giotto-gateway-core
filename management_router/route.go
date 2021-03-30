@@ -1,9 +1,10 @@
-package router
+package management_router
 
 import (
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/controller"
 	"github.com/LotteWong/giotto-gateway/docs"
-	"github.com/LotteWong/giotto-gateway/middleware"
+	"github.com/LotteWong/giotto-gateway/management_middleware"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -72,18 +73,18 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	}
 	commonMiddlewares := []gin.HandlerFunc{
 		sessions.Sessions("gateway_session", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.IpAuthMiddleware(),
-		middleware.TranslationMiddleware(),
+		common_middleware.RecoveryMiddleware(),
+		common_middleware.RequestLog(),
+		management_middleware.IpAuthMiddleware(),
+		common_middleware.TranslationMiddleware(),
 	}
 	enableRateLimiter := lib.GetBoolConf("base.rate_limiter.enable")
 	if enableRateLimiter {
-		commonMiddlewares = append(commonMiddlewares, middleware.RateLimitMiddleware())
+		commonMiddlewares = append(commonMiddlewares, management_middleware.RateLimitMiddleware())
 	}
 	enableCircuitBreaker := lib.GetBoolConf("base.circuit_breaker.enable")
 	if enableCircuitBreaker {
-		commonMiddlewares = append(commonMiddlewares, middleware.CircuitBreakMiddleware())
+		commonMiddlewares = append(commonMiddlewares, management_middleware.CircuitBreakMiddleware())
 	}
 
 	// swagger api routes
@@ -107,7 +108,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	// user api routes
 	userGroup := router.Group("/users")
 	userGroup.Use(commonMiddlewares...)
-	userGroup.Use(middleware.SessionAuthMiddleware())
+	userGroup.Use(management_middleware.SessionAuthMiddleware())
 	{
 		// GET    /users/admin
 		// PATCH  /users/admin
@@ -117,7 +118,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	// service api routes
 	serviceGroup := router.Group("/services")
 	serviceGroup.Use(commonMiddlewares...)
-	serviceGroup.Use(middleware.SessionAuthMiddleware())
+	serviceGroup.Use(management_middleware.SessionAuthMiddleware())
 	{
 		// GET    /services
 		// GET    /services/:service_id
@@ -134,7 +135,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	// app api routes
 	appGroup := router.Group("/apps")
 	appGroup.Use(commonMiddlewares...)
-	appGroup.Use(middleware.SessionAuthMiddleware())
+	appGroup.Use(management_middleware.SessionAuthMiddleware())
 	{
 		// GET    /apps
 		// GET    /apps/:app_id
@@ -147,7 +148,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	// dashboard api routes
 	dashboardGroup := router.Group("/dashboard")
 	dashboardGroup.Use(commonMiddlewares...)
-	dashboardGroup.Use(middleware.SessionAuthMiddleware())
+	dashboardGroup.Use(management_middleware.SessionAuthMiddleware())
 	{
 		// GET    /dashboard/statistics
 		// GET    /dashboard/flow

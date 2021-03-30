@@ -1,4 +1,4 @@
-package router
+package management_router
 
 import (
 	"context"

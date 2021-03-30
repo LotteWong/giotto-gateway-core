@@ -1,7 +1,8 @@
-package middleware
+package management_middleware
 
 import (
 	"fmt"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
@@ -53,11 +54,11 @@ func CircuitBreakMiddleware() gin.HandlerFunc {
 
 			switch err {
 			case hystrix.ErrCircuitOpen:
-				ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("circuit open error:"+err.Error())))
+				common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("circuit open error:"+err.Error())))
 			case hystrix.ErrMaxConcurrency:
-				ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("circuit max concurrency error:"+err.Error())))
+				common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("circuit max concurrency error:"+err.Error())))
 			default:
-				ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("circuit default error:"+err.Error())))
+				common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("circuit default error:"+err.Error())))
 			}
 			c.Abort()
 			return

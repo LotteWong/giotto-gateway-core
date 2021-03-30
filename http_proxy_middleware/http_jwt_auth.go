@@ -2,8 +2,8 @@ package http_proxy_middleware
 
 import (
 	"fmt"
+	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/middleware"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/gin-gonic/gin"
@@ -16,7 +16,7 @@ func HttpJwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		httpServiceInterface, ok := c.Get("service")
 		if !ok {
-			middleware.ResponseError(c, http.StatusInternalServerError, errors.New("service not found"))
+			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("service not found"))
 			c.Abort()
 			return
 		}
@@ -25,7 +25,7 @@ func HttpJwtAuthMiddleware() gin.HandlerFunc {
 		// parse authorization to get jwt
 		info := strings.Split(c.GetHeader("Authorization"), " ")
 		if len(info) != 2 {
-			middleware.ResponseError(c, http.StatusInternalServerError, errors.New("can not get jwt from authorization header"))
+			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("can not get jwt from authorization header"))
 			c.Abort()
 			return
 		}
@@ -43,7 +43,7 @@ func HttpJwtAuthMiddleware() gin.HandlerFunc {
 		}
 
 		if err != nil {
-			middleware.ResponseError(c, http.StatusInternalServerError, err)
+			common_middleware.ResponseError(c, http.StatusInternalServerError, err)
 			c.Abort()
 			return
 		}
