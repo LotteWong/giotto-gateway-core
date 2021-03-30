@@ -2,7 +2,6 @@ package load_balance
 
 import (
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/load_balance/lb_algos"
 )
 
 type LbType int
@@ -30,42 +29,42 @@ type IpAndWeight struct {
 func LoadBalanceFactory(lbType LbType) LoadBalance {
 	switch lbType {
 	case constants.LbTypeRandom:
-		return lb_algos.NewRandomLb()
+		return NewRandomLb()
 	case constants.LbTypeRoundRobin:
-		return lb_algos.NewRoundRobinLb()
+		return NewRoundRobinLb()
 	case constants.LbTypeWeightRoundRobin:
-		return lb_algos.NewWeightRoundRobinLb()
+		return NewWeightRoundRobinLb()
 	case constants.LbTypeConsistentHash:
-		return lb_algos.NewConsistentHashLb(constants.DefaultReplicas, constants.DefaultHashFunc)
+		return NewConsistentHashLb(DefaultReplicas, DefaultHashFunc)
 	default:
-		return lb_algos.NewRandomLb()
+		return NewRandomLb()
 	}
 }
 
 func LoadBalanceWithConfFactory(lbType LbType, conf LoadBalanceConf) LoadBalance {
 	switch lbType {
 	case constants.LbTypeRandom:
-		lb := lb_algos.NewRandomLb()
+		lb := NewRandomLb()
 		lb.Register(conf)
 		lb.Subscribe()
 		return lb
 	case constants.LbTypeRoundRobin:
-		lb := lb_algos.NewRoundRobinLb()
+		lb := NewRoundRobinLb()
 		lb.Register(conf)
 		lb.Subscribe()
 		return lb
 	case constants.LbTypeWeightRoundRobin:
-		lb := lb_algos.NewWeightRoundRobinLb()
+		lb := NewWeightRoundRobinLb()
 		lb.Register(conf)
 		lb.Subscribe()
 		return lb
 	case constants.LbTypeConsistentHash:
-		lb := lb_algos.NewConsistentHashLb(constants.DefaultReplicas, constants.DefaultHashFunc)
+		lb := NewConsistentHashLb(DefaultReplicas, DefaultHashFunc)
 		lb.Register(conf)
 		lb.Subscribe()
 		return lb
 	default:
-		lb := lb_algos.NewRandomLb()
+		lb := NewRandomLb()
 		lb.Register(conf)
 		lb.Subscribe()
 		return lb

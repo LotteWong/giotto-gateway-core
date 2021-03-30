@@ -1,8 +1,6 @@
-package lb_algos
+package load_balance
 
 import (
-	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/load_balance/lb_conf"
 	"github.com/pkg/errors"
 	"strconv"
 )
@@ -10,7 +8,7 @@ import (
 type WeightRoundRobinLb struct {
 	nodes []*IpAndWeightNode
 	idx   int
-	conf  load_balance.LoadBalanceConf
+	conf  LoadBalanceConf
 }
 
 type IpAndWeightNode struct {
@@ -90,13 +88,13 @@ func (lb *WeightRoundRobinLb) Get(key string) (string, error) {
 	}
 }
 
-func (lb *WeightRoundRobinLb) Register(conf load_balance.LoadBalanceConf) {
+func (lb *WeightRoundRobinLb) Register(conf LoadBalanceConf) {
 	lb.conf = conf
 	lb.conf.Attach(lb)
 }
 
 func (lb *WeightRoundRobinLb) Subscribe() {
-	if conf, ok := lb.conf.(*lb_conf.ClientSvcDiscoveryLbConf); ok {
+	if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
 		lb.nodes = []*IpAndWeightNode{}
 		for _, pair := range conf.GetConf() {
 			lb.Add(pair.Ip, strconv.Itoa(pair.Weight))

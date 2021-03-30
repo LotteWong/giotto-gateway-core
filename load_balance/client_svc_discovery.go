@@ -1,8 +1,7 @@
-package lb_conf
+package load_balance
 
 import (
 	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/load_balance"
 	"net"
 	"reflect"
 	"sort"
@@ -11,7 +10,7 @@ import (
 
 type ClientSvcDiscoveryLbConf struct {
 	// observers
-	lbs []load_balance.LoadBalance
+	lbs []LoadBalance
 	// configs
 	activeIps   []string
 	ipWeightMap map[string]int
@@ -22,7 +21,7 @@ type ClientSvcDiscoveryLbConf struct {
 func NewClientSvcDiscoveryLbConf(activeIps []string, ipWeightMap map[string]int, format string) *ClientSvcDiscoveryLbConf {
 	// initiate conf
 	conf := &ClientSvcDiscoveryLbConf{
-		lbs:         []load_balance.LoadBalance{},
+		lbs:         []LoadBalance{},
 		ipWeightMap: ipWeightMap,
 		activeIps:   activeIps,
 		format:      format,
@@ -34,7 +33,7 @@ func NewClientSvcDiscoveryLbConf(activeIps []string, ipWeightMap map[string]int,
 }
 
 // Attach is for subject to attach observer
-func (c *ClientSvcDiscoveryLbConf) Attach(lb load_balance.LoadBalance) {
+func (c *ClientSvcDiscoveryLbConf) Attach(lb LoadBalance) {
 	c.lbs = append(c.lbs, lb)
 }
 
@@ -87,15 +86,15 @@ func (c *ClientSvcDiscoveryLbConf) Publish() {
 	}()
 }
 
-func (c *ClientSvcDiscoveryLbConf) GetConf() []*load_balance.IpAndWeight {
-	var confs []*load_balance.IpAndWeight
+func (c *ClientSvcDiscoveryLbConf) GetConf() []*IpAndWeight {
+	var confs []*IpAndWeight
 
 	for _, ip := range c.activeIps {
 		weight, ok := c.ipWeightMap[ip]
 		if !ok {
 			weight = 50 // set default weight to 50
 		}
-		confs = append(confs, &load_balance.IpAndWeight{
+		confs = append(confs, &IpAndWeight{
 			Ip:     ip,
 			Weight: weight,
 		})

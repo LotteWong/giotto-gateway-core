@@ -1,13 +1,16 @@
-package lb_algos
+package load_balance
 
 import (
-	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/load_balance/lb_conf"
 	"github.com/pkg/errors"
 	"hash/crc32"
 	"sort"
 	"strconv"
 	"sync"
+)
+
+var (
+	DefaultHashFunc HashFunc = nil
+	DefaultReplicas          = 10
 )
 
 type HashFunc func(data []byte) uint32
@@ -32,7 +35,7 @@ type ConsistentHashLb struct {
 	hashFunc HashFunc
 	replicas int
 	RWLock   sync.RWMutex
-	conf     load_balance.LoadBalanceConf
+	conf     LoadBalanceConf
 }
 
 func NewConsistentHashLb(replicas int, function HashFunc) *ConsistentHashLb {
@@ -98,13 +101,13 @@ func (lb *ConsistentHashLb) Get(key string) (string, error) {
 	return ip, nil
 }
 
-func (lb *ConsistentHashLb) Register(conf load_balance.LoadBalanceConf) {
+func (lb *ConsistentHashLb) Register(conf LoadBalanceConf) {
 	lb.conf = conf
 	lb.conf.Attach(lb)
 }
 
 func (lb *ConsistentHashLb) Subscribe() {
-	if conf, ok := lb.conf.(*lb_conf.ClientSvcDiscoveryLbConf); ok {
+	if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
 		lb.hashMap = map[uint32]string{}
 		lb.hashRing = HashRing{}
 		for _, pair := range conf.GetConf() {
