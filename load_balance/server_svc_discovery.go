@@ -1,4 +1,4 @@
-package lb_conf
+package load_balance
 
 type ServerSvcDiscoveryLbConf struct {
 }

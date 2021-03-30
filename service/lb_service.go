@@ -5,7 +5,6 @@ import (
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/load_balance/lb_conf"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"strconv"
 	"sync"
@@ -78,7 +77,7 @@ func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.Loa
 	}
 	format := fmt.Sprintf("%s%s", schema, "%s")
 
-	conf := lb_conf.NewClientSvcDiscoveryLbConf(activeIps, ipWeightMap, format)
+	conf := load_balance.NewClientSvcDiscoveryLbConf(activeIps, ipWeightMap, format)
 	lbr := load_balance.LoadBalanceWithConfFactory(load_balance.LbType(svc.LoadBalance.RoundType), conf)
 
 	// miss in cache, write back to cache

@@ -111,6 +111,14 @@ func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail
 	return nil, errors.New(fmt.Sprintf("no matched service for path %s and host %s", path, host))
 }
 
+func (s *SvcService) TcpProxyAccessService() ([]*po.ServiceDetail, error) {
+	_, tcpServices, _, err := s.GroupServicesInMemory()
+	if err != nil {
+		return nil, err
+	}
+	return tcpServices, nil
+}
+
 func (s *SvcService) GroupServicesInMemory() ([]*po.ServiceDetail, []*po.ServiceDetail, []*po.ServiceDetail, error) {
 	var httpServices []*po.ServiceDetail
 	var tcpServices []*po.ServiceDetail

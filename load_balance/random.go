@@ -1,27 +1,26 @@
-package lb_algos
+package load_balance
 
 import (
-	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/load_balance/lb_conf"
 	"github.com/pkg/errors"
+	"math/rand"
 	"strconv"
 )
 
-type RoundRobinLb struct {
+type RandomLb struct {
 	ips  []string
 	idx  int
-	conf load_balance.LoadBalanceConf
+	conf LoadBalanceConf
 }
 
-func NewRoundRobinLb() *RoundRobinLb {
-	return &RoundRobinLb{
+func NewRandomLb() *RandomLb {
+	return &RandomLb{
 		ips:  []string{},
 		idx:  0,
 		conf: nil,
 	}
 }
 
-func (lb *RoundRobinLb) Add(params ...string) error {
+func (lb *RandomLb) Add(params ...string) error {
 	if len(params) == 0 {
 		return errors.New("params length is at least 1")
 	}
@@ -31,7 +30,7 @@ func (lb *RoundRobinLb) Add(params ...string) error {
 	return nil
 }
 
-func (lb *RoundRobinLb) Rmv(params ...string) error {
+func (lb *RandomLb) Rmv(params ...string) error {
 	if len(params) == 0 {
 		return errors.New("params length is at least 1")
 	}
@@ -49,29 +48,25 @@ func (lb *RoundRobinLb) Rmv(params ...string) error {
 	return nil
 }
 
-func (lb *RoundRobinLb) Get(key string) (string, error) {
+func (lb *RandomLb) Get(key string) (string, error) {
 	if len(lb.ips) == 0 {
 		return "", errors.New("no available ip")
 	}
 
-	ipLen := len(lb.ips)
-	if lb.idx >= ipLen {
-		lb.idx = 0
-	}
+	lb.idx = rand.Intn(len(lb.ips))
 	ip := lb.ips[lb.idx]
-	lb.idx = (lb.idx + 1) % ipLen
 
 	return ip, nil
 }
 
-func (lb *RoundRobinLb) Register(conf load_balance.LoadBalanceConf) {
+func (lb *RandomLb) Register(conf LoadBalanceConf) {
 	lb.conf = conf
 	lb.conf.Attach(lb)
 }
 
 // Subscribe is for observer to subscribe from subject
-func (lb *RoundRobinLb) Subscribe() {
-	if conf, ok := lb.conf.(*lb_conf.ClientSvcDiscoveryLbConf); ok {
+func (lb *RandomLb) Subscribe() {
+	if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
 		lb.ips = []string{}
 		for _, pair := range conf.GetConf() {
 			lb.Add(pair.Ip, strconv.Itoa(pair.Weight))

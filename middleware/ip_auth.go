@@ -16,21 +16,23 @@ func IpAuthMiddleware() gin.HandlerFunc {
 
 		if len(allowIps) > 0 {
 			authMode = "allow"
+			isMatched = false
 			for _, host := range allowIps {
 				if c.ClientIP() == host {
 					isMatched = true
+					break
 				}
 			}
-			isMatched = false
 		} else {
 			authMode = "block"
+			isMatched = true
 			if len(blockIps) > 0 {
 				for _, host := range blockIps {
 					if c.ClientIP() == host {
 						isMatched = false
+						break
 					}
 				}
-				isMatched = true
 			}
 		}
 
