@@ -33,7 +33,7 @@ func RegistServiceRoutes(grp *gin.RouterGroup) {
 // @Param keyword query string false "keyword"
 // @Param page_index query string false "page index"
 // @Param page_size query string false "page size"
-// @Success 200 {object} management_middleware.Response{data=dto.ListServicesRes} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.ListServicesRes} "success"
 // @Router /services [get]
 func (c *ServiceController) ListServices(ctx *gin.Context) {
 	// validate request params
@@ -70,7 +70,7 @@ func (c *ServiceController) ListServices(ctx *gin.Context) {
 // @Id /services/{service_id}
 // @Produce  json
 // @Param service_id path string true "service id"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/{service_id} [get]
 func (c *ServiceController) ShowService(ctx *gin.Context) {
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))
@@ -101,7 +101,7 @@ func (c *ServiceController) ShowService(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateHttpServiceReq true "create http service request body"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/http [post]
 func (c *ServiceController) CreateHttpService(ctx *gin.Context) {
 	// validate request params
@@ -136,7 +136,7 @@ func (c *ServiceController) CreateHttpService(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Param body body dto.CreateOrUpdateHttpServiceReq true "update http service request body"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/http/{service_id} [put]
 func (c *ServiceController) UpdateHttpService(ctx *gin.Context) {
 	// validate request params
@@ -175,7 +175,7 @@ func (c *ServiceController) UpdateHttpService(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateTcpServiceReq true "create tcp service request body"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/tcp [post]
 func (c *ServiceController) CreateTcpService(ctx *gin.Context) {
 	// validate request params
@@ -210,7 +210,7 @@ func (c *ServiceController) CreateTcpService(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Param body body dto.CreateOrUpdateTcpServiceReq true "update tcp service request body"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/tcp/{service_id} [put]
 func (c *ServiceController) UpdateTcpService(ctx *gin.Context) {
 	// validate request params
@@ -249,7 +249,7 @@ func (c *ServiceController) UpdateTcpService(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateGrpcServiceReq true "create grpc service request body"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/grpc [post]
 func (c *ServiceController) CreateGrpcService(ctx *gin.Context) {
 	// validate request params
@@ -284,7 +284,7 @@ func (c *ServiceController) CreateGrpcService(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Param body body dto.CreateOrUpdateGrpcServiceReq true "update grpc service request body"
-// @Success 200 {object} management_middleware.Response{data=po.ServiceDetail} "success"
+// @Success 200 {object} common_middleware.Response{data=po.ServiceDetail} "success"
 // @Router /services/grpc/{service_id} [put]
 func (c *ServiceController) UpdateGrpcService(ctx *gin.Context) {
 	// validate request params
@@ -322,7 +322,7 @@ func (c *ServiceController) UpdateGrpcService(ctx *gin.Context) {
 // @Id /services/{service_id}
 // @Produce  json
 // @Param service_id path string true "service id"
-// @Success 200 {object} management_middleware.Response{data=string} "success"
+// @Success 200 {object} common_middleware.Response{data=string} "success"
 // @Router /services/{service_id} [delete]
 func (c *ServiceController) DeleteService(ctx *gin.Context) {
 	serviceId, err := strconv.Atoi(ctx.Param("service_id"))

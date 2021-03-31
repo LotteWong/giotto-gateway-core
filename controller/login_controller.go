@@ -24,7 +24,7 @@ func RegistLoginRoutes(grp *gin.RouterGroup) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.LoginReq true "login request body"
-// @Success 200 {object} management_middleware.Response{data=dto.LoginRes} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.LoginRes} "success"
 // @Router /login [post]
 func (c *LoginController) Login(ctx *gin.Context) {
 	// validate request params
@@ -57,7 +57,7 @@ func (c *LoginController) Login(ctx *gin.Context) {
 // @Tags 登录接口
 // @Id /logout
 // @Produce  json
-// @Success 200 {object} management_middleware.Response{data=string} "success"
+// @Success 200 {object} common_middleware.Response{data=string} "success"
 // @Router /logout [post]
 func (c *LoginController) Logout(ctx *gin.Context) {
 	if err := service.GetLoginService().Logout(ctx); err != nil {
