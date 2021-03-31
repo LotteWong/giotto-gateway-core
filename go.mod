@@ -13,6 +13,7 @@ require (
 	github.com/gin-gonic/contrib v0.0.0-20190526021735-7fb7810ed2a0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/spec v0.20.3 // indirect
+	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -22,13 +23,14 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414 // indirect
+	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
 	github.com/ugorji/go v1.2.4 // indirect
 	golang.org/x/crypto v0.0.0-20210218145215-b8e89b74b9df // indirect
-	golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b // indirect
+	golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1 // indirect
+	golang.org/x/sys v0.0.0-20210412220455-f1c623a9e750 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

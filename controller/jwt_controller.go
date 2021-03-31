@@ -27,7 +27,7 @@ func RegistJwtRoutes(grp *gin.RouterGroup) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.JwtReq true "generate jwt request body"
-// @Success 200 {object} management_middleware.Response{data=dto.JwtRes} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.JwtRes} "success"
 // @Router /tokens/jwt [post]
 func (c *JwtController) GenerateJwt(ctx *gin.Context) {
 	// validate request params

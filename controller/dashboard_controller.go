@@ -28,7 +28,7 @@ func RegistDashboardRoutes(grp *gin.RouterGroup) {
 // @Tags 数据接口
 // @Id /statistics
 // @Produce  json
-// @Success 200 {object} management_middleware.Response{data=dto.Statistics} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.Statistics} "success"
 // @Router /statistics [get]
 func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
@@ -70,7 +70,7 @@ func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 // @Tags 数据接口
 // @Id /percentage/services
 // @Produce  json
-// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
 // @Router /percentage/services [get]
 func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
@@ -94,7 +94,7 @@ func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 // @Tags 数据接口
 // @Id /flow
 // @Produce  json
-// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
 // @Router /flow [get]
 func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 	count, err := service.GetFlowCountService().GetFlowCount(constants.TotalFlowCountPrefix)
@@ -133,7 +133,7 @@ func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 // @Id /flow/services/{service_id}
 // @Produce  json
 // @Param service_id path string true "service id"
-// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
 // @Router /flow/services/{service_id} [get]
 func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 	service_id, err := strconv.Atoi(ctx.Param("service_id"))
@@ -189,7 +189,7 @@ func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 // @Id /flow/apps/{app_id}
 // @Produce  json
 // @Param app_id path string true "app id"
-// @Success 200 {object} management_middleware.Response{data=dto.Flow} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
 // @Router /flow/apps/{app_id} [get]
 func (c *DashboardController) GetAppFlow(ctx *gin.Context) {
 	appId, err := strconv.Atoi(ctx.Param("app_id"))

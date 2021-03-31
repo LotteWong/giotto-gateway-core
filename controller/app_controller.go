@@ -29,7 +29,7 @@ func RegistAppRoutes(grp *gin.RouterGroup) {
 // @Param keyword query string false "keyword"
 // @Param page_index query string false "page index"
 // @Param page_size query string false "page size"
-// @Success 200 {object} management_middleware.Response{data=dto.ListAppsRes} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.ListAppsRes} "success"
 // @Router /apps [get]
 func (c *AppController) ListApps(ctx *gin.Context) {
 	// validate request params
@@ -66,7 +66,7 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 // @Id /apps/{app_id}
 // @Produce  json
 // @Param app_id path string true "app id"
-// @Success 200 {object} management_middleware.Response{data=po.App} "success"
+// @Success 200 {object} common_middleware.Response{data=po.App} "success"
 // @Router /apps/{app_id} [get]
 func (c *AppController) ShowApp(ctx *gin.Context) {
 	appId, err := strconv.Atoi(ctx.Param("app_id"))
@@ -97,7 +97,7 @@ func (c *AppController) ShowApp(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.CreateOrUpdateAppReq true "create app request body"
-// @Success 200 {object} management_middleware.Response{data=po.App} "success"
+// @Success 200 {object} common_middleware.Response{data=po.App} "success"
 // @Router /apps [post]
 func (c *AppController) CreateApp(ctx *gin.Context) {
 	// validate request params
@@ -132,7 +132,7 @@ func (c *AppController) CreateApp(ctx *gin.Context) {
 // @Produce  json
 // @Param app_id path string true "app id"
 // @Param body body dto.CreateOrUpdateAppReq true "update app request body"
-// @Success 200 {object} management_middleware.Response{data=po.App} "success"
+// @Success 200 {object} common_middleware.Response{data=po.App} "success"
 // @Router /apps/{app_id} [put]
 func (c *AppController) UpdateApp(ctx *gin.Context) {
 	// validate request params
@@ -170,7 +170,7 @@ func (c *AppController) UpdateApp(ctx *gin.Context) {
 // @Id /apps/{app_id}
 // @Produce  json
 // @Param app_id path string true "app id"
-// @Success 200 {object} management_middleware.Response{data=string} "success"
+// @Success 200 {object} common_middleware.Response{data=string} "success"
 // @Router /apps/{app_id} [delete]
 func (c *AppController) DeleteApp(ctx *gin.Context) {
 	appId, err := strconv.Atoi(ctx.Param("app_id"))

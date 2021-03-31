@@ -22,7 +22,7 @@ func RegistUserRoutes(grp *gin.RouterGroup) {
 // @Tags 用户接口
 // @Id /users/admin
 // @Produce  json
-// @Success 200 {object} management_middleware.Response{data=dto.UserInfo} "success"
+// @Success 200 {object} common_middleware.Response{data=dto.UserInfo} "success"
 // @Router /users/admin [get]
 func (c *UserController) GetUserInfo(ctx *gin.Context) {
 	userInfo, err := service.GetUserService().GetUserInfo(ctx)
@@ -42,8 +42,8 @@ func (c *UserController) GetUserInfo(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param body body dto.ChangeUserPwdReq true "change user password request body"
-// @Success 200 {object} management_middleware.Response{data=string} "success"
-// @Router /users/admin [POST]
+// @Success 200 {object} common_middleware.Response{data=string} "success"
+// @Router /users/admin [PATCH]
 func (c *UserController) ChangeUserPwd(ctx *gin.Context) {
 	// validate request params
 	req := &dto.ChangeUserPwdReq{}
