@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/LotteWong/giotto-gateway/grpc_proxy_router"
 	http_proxy_router "github.com/LotteWong/giotto-gateway/http_proxy_router"
 	"github.com/LotteWong/giotto-gateway/management_router"
 	"github.com/LotteWong/giotto-gateway/service"
@@ -64,11 +65,15 @@ func InitProxyServer(config string) {
 	go func() {
 		tcp_proxy_router.TcpServerRun()
 	}()
+	go func() {
+		grpc_proxy_router.GrpcServerRun()
+	}()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	grpc_proxy_router.GrpcServerStop()
 	tcp_proxy_router.TcpServerStop()
 	http_proxy_router.HttpServerStop()
 	// http_proxy_router.HttpsServerStop()
