@@ -8,6 +8,8 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/LotteWong/tcp-conn-server v0.0.0-20210417063638-fc2a09240890 h1:hCvRhfRfyRZDPbX8vkWzx/+3wrXWYaJ7wNZKpvKuJcQ=
 github.com/LotteWong/tcp-conn-server v0.0.0-20210417063638-fc2a09240890/go.mod h1:tmtRg3pfZYo/Di5WLaPpeyBVgc+tUyK3ytSI0hqnqy8=
+github.com/LotteWong/tcp-conn-server v0.0.0-20210417075150-d4ab7448a98f h1:gyxPclnR8veL8crpGoM6z47hahf6/uDFfE5/FIUXgUQ=
+github.com/LotteWong/tcp-conn-server v0.0.0-20210417075150-d4ab7448a98f/go.mod h1:tmtRg3pfZYo/Di5WLaPpeyBVgc+tUyK3ytSI0hqnqy8=
 github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/purell v1.1.1 h1:WEQqlqaGbrPkxLJWfBwQmfEAE1Z7ONdDLqrN38tNFfI=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
