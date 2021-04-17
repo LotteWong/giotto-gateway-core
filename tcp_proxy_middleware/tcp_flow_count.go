@@ -4,11 +4,11 @@ import (
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/service"
-	tcp_server "github.com/LotteWong/tcp-conn-server"
+	tcp "github.com/LotteWong/tcp-conn-server"
 )
 
-func TcpFlowCountMiddleware() func(c *tcp_server.TcpRouterContext) {
-	return func(c *tcp_server.TcpRouterContext) {
+func TcpFlowCountMiddleware() func(c *tcp.TcpRouterContext) {
+	return func(c *tcp.TcpRouterContext) {
 		tcpServiceInterface := c.Get("service")
 		if tcpServiceInterface == nil {
 			c.Conn.Write([]byte("service not found"))
