@@ -2,14 +2,16 @@ package main
 
 import (
 	"flag"
-	http_proxy_router "github.com/LotteWong/giotto-gateway/http_proxy_router"
-	"github.com/LotteWong/giotto-gateway/management_router"
-	"github.com/LotteWong/giotto-gateway/service"
-	"github.com/e421083458/golang_common/lib"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	http_proxy_router "github.com/LotteWong/giotto-gateway/http_proxy_router"
+	"github.com/LotteWong/giotto-gateway/management_router"
+	"github.com/LotteWong/giotto-gateway/service"
+	tcp_proxy_router "github.com/LotteWong/giotto-gateway/tcp_proxy_router"
+	"github.com/e421083458/golang_common/lib"
 )
 
 var (
@@ -56,14 +58,18 @@ func InitProxyServer(config string) {
 	go func() {
 		http_proxy_router.HttpServerRun()
 	}()
+	// go func() {
+	// 	http_proxy_router.HttpsServerRun()
+	// }()
 	go func() {
-		http_proxy_router.HttpsServerRun()
+		tcp_proxy_router.TcpServerRun()
 	}()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	tcp_proxy_router.TcpServerStop()
 	http_proxy_router.HttpServerStop()
-	http_proxy_router.HttpsServerStop()
+	// http_proxy_router.HttpsServerStop()
 }
