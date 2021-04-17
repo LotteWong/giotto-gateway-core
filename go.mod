@@ -3,6 +3,7 @@ module github.com/LotteWong/giotto-gateway
 go 1.14
 
 require (
+	github.com/LotteWong/tcp-conn-server v0.0.0-20210417063638-fc2a09240890
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
