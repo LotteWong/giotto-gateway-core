@@ -2,6 +2,9 @@ package service
 
 import (
 	"fmt"
+	"net/http/httptest"
+	"sync"
+
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/dao/mysql"
 	"github.com/LotteWong/giotto-gateway/models/dto"
@@ -11,8 +14,6 @@ import (
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"net/http/httptest"
-	"sync"
 )
 
 var appService *AppService
@@ -187,7 +188,7 @@ func (s *AppService) DeleteApp(ctx *gin.Context, tx *gorm.DB, appId int64) error
 }
 
 func (s *AppService) validCreateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrUpdateAppReq) error {
-	// check whether service name is duplicated
+	// check whether app id is duplicated
 	if _, err := s.appOperator.Find(ctx, tx, &po.App{AppId: req.AppId}); err == nil {
 		return errors.New(fmt.Sprintf("app id %s is duplicated", req.AppId))
 	}

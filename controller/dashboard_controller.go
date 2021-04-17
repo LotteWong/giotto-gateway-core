@@ -1,14 +1,15 @@
 package controller
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"time"
 )
 
 type DashboardController struct{}
@@ -29,7 +30,7 @@ func RegistDashboardRoutes(grp *gin.RouterGroup) {
 // @Id /statistics
 // @Produce  json
 // @Success 200 {object} common_middleware.Response{data=dto.Statistics} "success"
-// @Router /statistics [get]
+// @Router /dashboard/statistics [get]
 func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
@@ -70,8 +71,8 @@ func (c *DashboardController) GetStatistics(ctx *gin.Context) {
 // @Tags 数据接口
 // @Id /percentage/services
 // @Produce  json
-// @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
-// @Router /percentage/services [get]
+// @Success 200 {object} common_middleware.Response{data=dto.ServicePercentageItems} "success"
+// @Router /dashboard/percentage/services [get]
 func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
@@ -95,7 +96,7 @@ func (c *DashboardController) GetServicePercentage(ctx *gin.Context) {
 // @Id /flow
 // @Produce  json
 // @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
-// @Router /flow [get]
+// @Router /dashboard/flow [get]
 func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 	count, err := service.GetFlowCountService().GetFlowCount(constants.TotalFlowCountPrefix)
 	if err != nil {
@@ -134,7 +135,7 @@ func (c *DashboardController) GetTotalFlow(ctx *gin.Context) {
 // @Produce  json
 // @Param service_id path string true "service id"
 // @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
-// @Router /flow/services/{service_id} [get]
+// @Router /dashboard/flow/services/{service_id} [get]
 func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 	service_id, err := strconv.Atoi(ctx.Param("service_id"))
 	if err != nil {
@@ -190,7 +191,7 @@ func (c *DashboardController) GetServiceFlow(ctx *gin.Context) {
 // @Produce  json
 // @Param app_id path string true "app id"
 // @Success 200 {object} common_middleware.Response{data=dto.Flow} "success"
-// @Router /flow/apps/{app_id} [get]
+// @Router /dashboard/flow/apps/{app_id} [get]
 func (c *DashboardController) GetAppFlow(ctx *gin.Context) {
 	appId, err := strconv.Atoi(ctx.Param("app_id"))
 	if err != nil {

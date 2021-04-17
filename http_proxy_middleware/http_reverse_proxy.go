@@ -1,13 +1,14 @@
 package http_proxy_middleware
 
 import (
+	"net/http"
+
 	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/reverse_proxy"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 func HttpReverseProxyMiddleware() gin.HandlerFunc {
@@ -34,7 +35,7 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 		}
 
 		// use reverse proxy to serve http
-		proxy := reverse_proxy.NewReverseProxy(c, lb, trans)
+		proxy := reverse_proxy.NewHttpReverseProxy(c, lb, trans)
 		proxy.ServeHTTP(c.Writer, c.Request)
 
 		// abort the original server to be accessed

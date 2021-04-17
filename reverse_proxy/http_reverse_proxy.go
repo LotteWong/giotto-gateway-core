@@ -1,17 +1,18 @@
 package reverse_proxy
 
 import (
-	"github.com/LotteWong/giotto-gateway/common_middleware"
-	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/utils"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
+
+	"github.com/LotteWong/giotto-gateway/common_middleware"
+	"github.com/LotteWong/giotto-gateway/load_balance"
+	"github.com/LotteWong/giotto-gateway/utils"
+	"github.com/gin-gonic/gin"
 )
 
-func NewReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *http.Transport) *httputil.ReverseProxy {
+func NewHttpReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *http.Transport) *httputil.ReverseProxy {
 	// convert the source request to target request
 	director := func(req *http.Request) {
 		var err error
