@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/LotteWong/giotto-gateway/grpc_proxy_middleware"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/reverse_proxy"
 	"github.com/LotteWong/giotto-gateway/service"
@@ -37,9 +38,16 @@ func GrpcServerRun() {
 			grpcSrvHandler := reverse_proxy.NewGrpcReverseProxy(lb)
 
 			grpcServer := grpc.NewServer(
-				// grpc.ChainStreamInterceptor(
-				// 	// TODO
-				// ),
+				grpc.ChainStreamInterceptor(
+					grpc_proxy_middleware.GrpcJwtAuthMiddleware(serviceDetail),
+
+					grpc_proxy_middleware.GrpcFlowCountMiddleware(serviceDetail),
+					grpc_proxy_middleware.GrpcRateLimitMiddleware(serviceDetail),
+
+					grpc_proxy_middleware.GrpcIpAuthMiddleware(serviceDetail),
+
+					grpc_proxy_middleware.GrpcRouteRewriteMiddleware(serviceDetail),
+				),
 				grpc.CustomCodec(proxy.Codec()),
 				grpc.UnknownServiceHandler(grpcSrvHandler),
 			)
