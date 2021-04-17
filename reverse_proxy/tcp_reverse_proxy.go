@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/LotteWong/giotto-gateway/load_balance"
-	tcp_server "github.com/LotteWong/tcp-conn-server"
+	tcp "github.com/LotteWong/tcp-conn-server"
 )
 
-func NewTcpReverseProxy(ctx *tcp_server.TcpRouterContext, lb load_balance.LoadBalance) *TcpReverseProxy {
+func NewTcpReverseProxy(ctx *tcp.TcpRouterContext, lb load_balance.LoadBalance) *TcpReverseProxy {
 	return func() *TcpReverseProxy {
 		addr, err := lb.Get("")
 		if err != nil {

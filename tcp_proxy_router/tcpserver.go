@@ -8,10 +8,10 @@ import (
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/reverse_proxy"
 	"github.com/LotteWong/giotto-gateway/service"
-	tcp_server "github.com/LotteWong/tcp-conn-server"
+	tcp "github.com/LotteWong/tcp-conn-server"
 )
 
-var tcpServers []*tcp_server.TcpServer
+var tcpServers []*tcp.TcpServer
 
 func TcpServerRun() {
 	_, tcpServices, _, err := service.GetSvcService().GroupServicesInMemory()
@@ -30,12 +30,12 @@ func TcpServerRun() {
 			}
 			r := InitRouter()
 
-			tcpSrvHandler := tcp_server.NewTcpRouteHandler(r, func(ctx *tcp_server.TcpRouterContext) tcp_server.TCPHandler {
+			tcpSrvHandler := tcp.NewTcpRouteHandler(r, func(ctx *tcp.TcpRouterContext) tcp.TCPHandler {
 				return reverse_proxy.NewTcpReverseProxy(ctx, lb)
 			})
 			baseCtx := context.WithValue(context.Background(), "service", serviceDetail)
 
-			tcpServer := &tcp_server.TcpServer{
+			tcpServer := &tcp.TcpServer{
 				Addr:    addr,
 				Handler: tcpSrvHandler,
 				BaseCtx: baseCtx,
@@ -43,7 +43,7 @@ func TcpServerRun() {
 			tcpServers = append(tcpServers, tcpServer)
 
 			log.Printf(" [INFO] TcpServerRun - tcp proxy server:%s\n", addr)
-			if err := tcpServer.ListenAndServe(); err != nil && err != tcp_server.ErrServerClosed {
+			if err := tcpServer.ListenAndServe(); err != nil && err != tcp.ErrServerClosed {
 				log.Fatalf(" [ERROR] TcpServerRun - tcp proxy server:%s err:%v\n", addr, err)
 			}
 		}(tmpService)
