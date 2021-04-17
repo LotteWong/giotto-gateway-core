@@ -3,6 +3,8 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/models/dto"
 	"github.com/LotteWong/giotto-gateway/models/po"
@@ -11,7 +13,7 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
-	"time"
+	"google.golang.org/grpc/metadata"
 )
 
 var jwtService *JwtService
@@ -64,7 +66,7 @@ func (s *JwtService) GenerateJwt(ctx *gin.Context, tx *gorm.DB, req *dto.JwtReq,
 	return nil, errors.New(fmt.Sprintf("secret %s for app %s is incorrect", secret, appId))
 }
 
-func (s *JwtService) VerifyJwt(ctx *gin.Context, svc *po.ServiceDetail, tokenString string) error {
+func (s *JwtService) HttpVerifyJwt(ctx *gin.Context, svc *po.ServiceDetail, tokenString string) error {
 	isMatched := false
 
 	if tokenString != "" {
@@ -79,6 +81,34 @@ func (s *JwtService) VerifyJwt(ctx *gin.Context, svc *po.ServiceDetail, tokenStr
 		for _, app := range apps {
 			if app.AppId == claims.Issuer {
 				ctx.Set("app", app)
+				isMatched = true
+				break
+			}
+		}
+	}
+
+	if svc.AccessControl.OpenAuth == constants.Enable && !isMatched {
+		return errors.New("failed to verify jwt, err: no matched valid app")
+	}
+
+	return nil
+}
+
+func (s *JwtService) GrpcVerifyJwt(ctx metadata.MD, svc *po.ServiceDetail, tokenString string) error {
+	isMatched := false
+
+	if tokenString != "" {
+		// verify expire at
+		claims, err := utils.DecodeJwt(tokenString)
+		if err != nil {
+			return err
+		}
+
+		// verify issuer
+		apps := GetAppService().ListAppsInMemory()
+		for _, app := range apps {
+			if app.AppId == claims.Issuer {
+				ctx.Set("app", utils.Obj2Json(app))
 				isMatched = true
 				break
 			}

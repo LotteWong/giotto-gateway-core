@@ -2,14 +2,15 @@ package http_proxy_middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/LotteWong/giotto-gateway/service"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"net/http"
-	"strings"
 )
 
 func HttpJwtAuthMiddleware() gin.HandlerFunc {
@@ -23,21 +24,21 @@ func HttpJwtAuthMiddleware() gin.HandlerFunc {
 		httpServiceDetail := httpServiceInterface.(*po.ServiceDetail)
 
 		// parse authorization to get jwt
-		info := strings.Split(c.GetHeader("Authorization"), " ")
-		if len(info) != 2 {
+		pair := strings.Split(c.GetHeader("Authorization"), " ")
+		if len(pair) != 2 {
 			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("can not get jwt from authorization header"))
 			c.Abort()
 			return
 		}
 
-		tokenType := info[0]
-		tokenString := info[1]
+		tokenType := pair[0]
+		tokenString := pair[1]
 
 		// verify jwt by expire at and issuer
 		var err error
 		switch tokenType {
 		case constants.JwtType:
-			err = service.GetJwtService().VerifyJwt(c, httpServiceDetail, tokenString)
+			err = service.GetJwtService().HttpVerifyJwt(c, httpServiceDetail, tokenString)
 		default:
 			err = errors.New(fmt.Sprintf("not support jwt type %s", tokenType))
 		}
