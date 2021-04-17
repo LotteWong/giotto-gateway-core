@@ -256,7 +256,7 @@ var doc = `{
                 }
             }
         },
-        "/flow": {
+        "/dashboard/flow": {
             "get": {
                 "description": "查询全部流量",
                 "produces": [
@@ -289,7 +289,7 @@ var doc = `{
                 }
             }
         },
-        "/flow/apps/{app_id}": {
+        "/dashboard/flow/apps/{app_id}": {
             "get": {
                 "description": "查询租户流量",
                 "produces": [
@@ -331,7 +331,7 @@ var doc = `{
                 }
             }
         },
-        "/flow/services/{service_id}": {
+        "/dashboard/flow/services/{service_id}": {
             "get": {
                 "description": "查询服务流量",
                 "produces": [
@@ -364,6 +364,72 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/dto.Flow"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/percentage/services": {
+            "get": {
+                "description": "查询服务类型占比",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据接口"
+                ],
+                "summary": "查询服务类型占比接口",
+                "operationId": "/percentage/services",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common_middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ServicePercentageItems"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/statistics": {
+            "get": {
+                "description": "查询统计指标",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据接口"
+                ],
+                "summary": "查询统计指标接口",
+                "operationId": "/statistics",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common_middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.Statistics"
                                         }
                                     }
                                 }
@@ -444,39 +510,6 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/percentage/services": {
-            "get": {
-                "description": "查询服务类型占比",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "数据接口"
-                ],
-                "summary": "查询服务类型占比接口",
-                "operationId": "/percentage/services",
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/common_middleware.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.Flow"
                                         }
                                     }
                                 }
@@ -915,39 +948,6 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/statistics": {
-            "get": {
-                "description": "查询统计指标",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "数据接口"
-                ],
-                "summary": "查询统计指标接口",
-                "operationId": "/statistics",
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/common_middleware.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.Statistics"
                                         }
                                     }
                                 }
@@ -1544,6 +1544,42 @@ var doc = `{
                     "description": "登录令牌",
                     "type": "string",
                     "example": "token"
+                }
+            }
+        },
+        "dto.ServicePercentageItem": {
+            "type": "object",
+            "properties": {
+                "service_count": {
+                    "description": "服务个数",
+                    "type": "integer"
+                },
+                "service_legend": {
+                    "description": "服务图例",
+                    "type": "string"
+                },
+                "service_type": {
+                    "description": "服务类型",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ServicePercentageItems": {
+            "type": "object",
+            "properties": {
+                "legends": {
+                    "description": "图例列表",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "records": {
+                    "description": "数据列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ServicePercentageItem"
+                    }
                 }
             }
         },

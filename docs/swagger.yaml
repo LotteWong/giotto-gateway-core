@@ -331,6 +331,31 @@ definitions:
         example: token
         type: string
     type: object
+  dto.ServicePercentageItem:
+    properties:
+      service_count:
+        description: 服务个数
+        type: integer
+      service_legend:
+        description: 服务图例
+        type: string
+      service_type:
+        description: 服务类型
+        type: integer
+    type: object
+  dto.ServicePercentageItems:
+    properties:
+      legends:
+        description: 图例列表
+        items:
+          type: string
+        type: array
+      records:
+        description: 数据列表
+        items:
+          $ref: '#/definitions/dto.ServicePercentageItem'
+        type: array
+    type: object
   dto.Statistics:
     properties:
       app_count:
@@ -652,7 +677,7 @@ paths:
       summary: 更新租户接口
       tags:
       - 租户接口
-  /flow:
+  /dashboard/flow:
     get:
       description: 查询全部流量
       operationId: /flow
@@ -671,7 +696,7 @@ paths:
       summary: 查询全部流量接口
       tags:
       - 数据接口
-  /flow/apps/{app_id}:
+  /dashboard/flow/apps/{app_id}:
     get:
       description: 查询租户流量
       operationId: /flow/apps/{app_id}
@@ -696,7 +721,7 @@ paths:
       summary: 查询租户流量接口
       tags:
       - 数据接口
-  /flow/services/{service_id}:
+  /dashboard/flow/services/{service_id}:
     get:
       description: 查询服务流量
       operationId: /flow/services/{service_id}
@@ -719,6 +744,44 @@ paths:
                   $ref: '#/definitions/dto.Flow'
               type: object
       summary: 查询服务流量接口
+      tags:
+      - 数据接口
+  /dashboard/percentage/services:
+    get:
+      description: 查询服务类型占比
+      operationId: /percentage/services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/common_middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServicePercentageItems'
+              type: object
+      summary: 查询服务类型占比接口
+      tags:
+      - 数据接口
+  /dashboard/statistics:
+    get:
+      description: 查询统计指标
+      operationId: /statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/common_middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.Statistics'
+              type: object
+      summary: 查询统计指标接口
       tags:
       - 数据接口
   /login:
@@ -768,25 +831,6 @@ paths:
       summary: 用户登出接口
       tags:
       - 登录接口
-  /percentage/services:
-    get:
-      description: 查询服务类型占比
-      operationId: /percentage/services
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            allOf:
-            - $ref: '#/definitions/common_middleware.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.Flow'
-              type: object
-      summary: 查询服务类型占比接口
-      tags:
-      - 数据接口
   /services:
     get:
       description: 查询服务列表
@@ -1051,25 +1095,6 @@ paths:
       summary: 更新tcp服务接口
       tags:
       - 服务接口
-  /statistics:
-    get:
-      description: 查询统计指标
-      operationId: /statistics
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            allOf:
-            - $ref: '#/definitions/common_middleware.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.Statistics'
-              type: object
-      summary: 查询统计指标接口
-      tags:
-      - 数据接口
   /tokens/jwt:
     post:
       consumes:

@@ -1,10 +1,13 @@
 package http_proxy_middleware
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func HttpProxyAccessMiddleware() gin.HandlerFunc {
@@ -15,7 +18,7 @@ func HttpProxyAccessMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		//log.Printf("matched http service: %s", utils.Obj2Json(httpService))
+		log.Printf("matched http service: %s\n", utils.Obj2Json(httpService))
 		c.Set("service", httpService)
 		c.Next()
 	}
