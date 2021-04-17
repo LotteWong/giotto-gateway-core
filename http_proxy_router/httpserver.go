@@ -60,7 +60,7 @@ func HttpsServerRun() {
 	log.Printf(" [INFO] HttpsServerRun - https proxy server:%s\n", lib.GetStringConf("proxy.https.addr"))
 	certFile := lib.GetStringConf("proxy.https.cert_file")
 	keyFile := lib.GetStringConf("proxy.https.key_file")
-	if err := HttpsSrvHandler.ListenAndServeTLS(certFile, keyFile); err != nil {
+	if err := HttpsSrvHandler.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
 		log.Fatalf(" [ERROR] HttpsServerRun - https proxy server:%s err:%v\n", lib.GetStringConf("proxy.https.addr"), err)
 	}
 }
