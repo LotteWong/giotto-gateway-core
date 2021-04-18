@@ -1,6 +1,8 @@
 package management_router
 
 import (
+	"log"
+
 	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/controller"
 	"github.com/LotteWong/giotto-gateway/docs"
@@ -8,9 +10,8 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
-	"log"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title Swagger Example API
@@ -158,5 +159,6 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		controller.RegistDashboardRoutes(dashboardGroup)
 	}
 
+	router.Static("/dist", "./dist")
 	return router
 }

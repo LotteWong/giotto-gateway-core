@@ -1,0 +1,41 @@
+# deploy config
+apiVersion: deploy/v1
+kind: Deployment
+metadata:
+  name: giotto-gateway-proxy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: giotto-gateway-proxy
+  template:
+    metadata:
+      labels:
+        name: giotto-gateway-proxy
+    spec:
+      containers:
+        - name: giotto-gateway-proxy
+          image: giotto-gateway-proxy:d1785da
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+---
+# service config
+apiVersion: service/v1
+kind: Service
+spec:
+  ports:
+    - port: 80
+      name: "http-proxy"
+      targetPort: 80
+      protocol: TCP
+      nodePort: 30080
+    - port: 443
+      name: "https-proxy"
+      targetPort: 443
+      protocol: TCP
+      nodePort: 30443
+  type: NodePort
+  selector:
+    name: giotto-gateway-proxy
