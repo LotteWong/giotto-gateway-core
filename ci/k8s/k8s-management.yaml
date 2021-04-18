@@ -1,0 +1,35 @@
+# deploy config
+apiVersion: deploy/v1
+kind: Deployment
+metadata:
+  name: giotto-gateway-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: giotto-gateway-management
+  template:
+    metadata:
+      labels:
+        name: giotto-gateway-management
+    spec:
+      containers:
+        - name: giotto-gateway-management
+          image: giotto-gateway-management:d1785da
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8880
+---
+# service config
+apiVersion: service/v1
+kind: Service
+spec:
+  ports:
+    - port: 8880
+      name: "management"
+      targetPort: 8880
+      protocol: TCP
+      nodePort: 30888
+  type: NodePort
+  selector:
+    name: giotto-gateway-management
