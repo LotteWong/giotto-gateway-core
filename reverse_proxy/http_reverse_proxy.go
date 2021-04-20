@@ -21,7 +21,7 @@ func NewHttpReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *h
 		if err != nil {
 			panic(err)
 		}
-		targetUrl, err := url.Parse(targetStr)
+		targetUrl, err := url.Parse("http://" + targetStr)
 		if err != nil {
 			panic(err)
 		}
