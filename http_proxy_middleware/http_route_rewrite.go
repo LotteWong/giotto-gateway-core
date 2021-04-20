@@ -1,15 +1,16 @@
 package http_proxy_middleware
 
 import (
+	"log"
+	"net/http"
+	"regexp"
+	"strings"
+
 	"github.com/LotteWong/giotto-gateway/common_middleware"
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"log"
-	"net/http"
-	"regexp"
-	"strings"
 )
 
 func HttpRouteRewriteMiddleware() gin.HandlerFunc {
@@ -24,6 +25,10 @@ func HttpRouteRewriteMiddleware() gin.HandlerFunc {
 
 		// need to rewrite url
 		for _, rule := range strings.Split(httpServiceDetail.HttpRule.UrlRewrite, ",") {
+			if rule == "" {
+				continue
+			}
+
 			items := strings.Split(rule, " ")
 			if len(items) != 2 {
 				log.Println("url rewrite format error")

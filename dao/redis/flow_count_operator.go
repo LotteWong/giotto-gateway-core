@@ -2,12 +2,13 @@ package redis
 
 import (
 	"fmt"
+	"sync/atomic"
+	"time"
+
 	"github.com/LotteWong/giotto-gateway/constants"
 	"github.com/LotteWong/giotto-gateway/models/po"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/garyburd/redigo/redis"
-	"sync/atomic"
-	"time"
 )
 
 type FlowCountOperator struct{}
@@ -66,7 +67,7 @@ func (o *FlowCountOperator) GetFlowCount(req *po.FlowCount) *po.FlowCount {
 			if nowUnix > res.Unix {
 				res.TotalCount = totalCount
 				res.Qps = tickerCount / (nowUnix - res.Unix)
-				res.TickerCount = tickerCount
+				// res.TickerCount = tickerCount
 				res.Unix = time.Now().Unix()
 			}
 		}
