@@ -2,13 +2,14 @@ package http_proxy_middleware
 
 import (
 	"fmt"
-	"github.com/LotteWong/giotto-gateway/common_middleware"
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"net/http"
 	"strings"
+
+	"github.com/LotteWong/giotto-gateway-core/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 func HttpIpAuthMiddleware() gin.HandlerFunc {

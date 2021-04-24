@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/LotteWong/giotto-gateway/common_middleware"
-	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/utils"
+	"github.com/LotteWong/giotto-gateway-core/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/load_balance"
+	"github.com/LotteWong/giotto-gateway-core/utils"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,9 +1,10 @@
 package service
 
 import (
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"golang.org/x/time/rate"
 	"sync"
+
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"golang.org/x/time/rate"
 )
 
 var rateLimitService *RateLimitService

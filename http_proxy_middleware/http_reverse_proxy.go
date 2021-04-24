@@ -3,10 +3,10 @@ package http_proxy_middleware
 import (
 	"net/http"
 
-	"github.com/LotteWong/giotto-gateway/common_middleware"
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/reverse_proxy"
-	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway-core/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/reverse_proxy"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )

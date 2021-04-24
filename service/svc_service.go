@@ -2,17 +2,18 @@ package service
 
 import (
 	"fmt"
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/dao/mysql"
-	"github.com/LotteWong/giotto-gateway/models/dto"
-	"github.com/LotteWong/giotto-gateway/models/po"
+	"net/http/httptest"
+	"strings"
+	"sync"
+
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/dao/mysql"
+	"github.com/LotteWong/giotto-gateway-core/models/dto"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"net/http/httptest"
-	"strings"
-	"sync"
 )
 
 var svcService *SvcService

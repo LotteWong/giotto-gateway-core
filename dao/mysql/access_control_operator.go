@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/utils"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/utils"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 )

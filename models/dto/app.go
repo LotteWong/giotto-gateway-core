@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/LotteWong/giotto-gateway/utils"
+	"github.com/LotteWong/giotto-gateway-core/utils"
 	"github.com/gin-gonic/gin"
 )
 

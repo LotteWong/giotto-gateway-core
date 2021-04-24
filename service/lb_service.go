@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/dao/mysql"
-	"github.com/LotteWong/giotto-gateway/load_balance"
-	"github.com/LotteWong/giotto-gateway/models/po"
 	"strconv"
 	"sync"
+
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/dao/mysql"
+	"github.com/LotteWong/giotto-gateway-core/load_balance"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
 )
 
 var lbService *LbService

@@ -1,24 +1,14 @@
-# giotto-gateway
+# giotto-gateway-core
 
-A powerful golang microservice api gateway.
+The core part of a powerful golang microservice api gateway.
 
 ---
 
-### Features
-
-- [x] Login / Logout
-- [x] Query / Update Admin Info
-- [x] CURD Http/Tcp/Grpc Service
-- [x] CURD App
-- [x] Dashboard Flow/Percentage/Statistics
-- [x] Rate Limiter Middleware
-- [x] Circuit Breaker Middleware
-
-### Todos
+## Todos
 
 - [ ] Migrate Schemas
 - [ ] Websocket Proxy Server
+- [ ] Https Proxy Server
 - [ ] Improve Configs
 - [ ] Improve Dao
 - [ ] Generate Secrets
-- [ ] App Flow Count

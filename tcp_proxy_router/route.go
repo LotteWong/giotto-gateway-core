@@ -1,7 +1,7 @@
 package tcp_proxy_router
 
 import (
-	"github.com/LotteWong/giotto-gateway/tcp_proxy_middleware"
+	"github.com/LotteWong/giotto-gateway-core/tcp_proxy_middleware"
 	tcp "github.com/LotteWong/tcp-conn-server"
 )
 

@@ -1,8 +1,9 @@
 package po
 
 import (
-	"github.com/LotteWong/giotto-gateway/load_balance"
 	"strings"
+
+	"github.com/LotteWong/giotto-gateway-core/load_balance"
 )
 
 type LoadBalance struct {

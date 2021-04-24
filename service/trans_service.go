@@ -1,12 +1,13 @@
 package service
 
 import (
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
 	"net"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
 )
 
 var transService *TransService

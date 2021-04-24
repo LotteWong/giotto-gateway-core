@@ -2,11 +2,12 @@ package common_middleware
 
 import (
 	"bytes"
-	"github.com/LotteWong/giotto-gateway/utils"
-	"github.com/e421083458/golang_common/lib"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"time"
+
+	"github.com/LotteWong/giotto-gateway-core/utils"
+	"github.com/e421083458/golang_common/lib"
+	"github.com/gin-gonic/gin"
 )
 
 // 请求进入日志

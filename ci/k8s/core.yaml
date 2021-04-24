@@ -2,20 +2,20 @@
 apiVersion: deploy/v1
 kind: Deployment
 metadata:
-  name: giotto-gateway-proxy
+  name: giotto-gateway-core
 spec:
   replicas: 3
   selector:
     matchLabels:
-      name: giotto-gateway-proxy
+      name: giotto-gateway-core
   template:
     metadata:
       labels:
-        name: giotto-gateway-proxy
+        name: giotto-gateway-core
     spec:
       containers:
-        - name: giotto-gateway-proxy
-          image: giotto-gateway-proxy:d1785da
+        - name: giotto-gateway-core
+          image: giotto-gateway-core:d1785da
           imagePullPolicy: Never
           ports:
             - containerPort: 80
@@ -38,4 +38,4 @@ spec:
       nodePort: 30443
   type: NodePort
   selector:
-    name: giotto-gateway-proxy
+    name: giotto-gateway-core

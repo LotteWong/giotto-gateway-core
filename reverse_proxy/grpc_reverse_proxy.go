@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/LotteWong/giotto-gateway/load_balance"
+	"github.com/LotteWong/giotto-gateway-core/load_balance"
 	"github.com/e421083458/grpc-proxy/proxy"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"

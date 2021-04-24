@@ -4,4 +4,4 @@ MAINTAINER LotteWong <lottewong21@gmail.com>
 WORKDIR /go/src/app
 COPY .. .
 
-CMD ./bin/giotto_gateway -config ./config/prod/ -endpoint proxy
+CMD ./bin/giotto_gateway_core -config ./config/prod/

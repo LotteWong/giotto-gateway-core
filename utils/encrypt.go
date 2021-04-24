@@ -4,11 +4,12 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/pkg/errors"
 	"hash"
 	"io"
+
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 )
 
 func GenSaltPwd(salt, password string) string {

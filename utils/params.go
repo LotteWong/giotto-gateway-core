@@ -1,12 +1,13 @@
 package utils
 
 import (
-	"github.com/LotteWong/giotto-gateway/constants"
+	"strings"
+
+	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/universal-translator"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/pkg/errors"
 	"gopkg.in/go-playground/validator.v9"
-	"strings"
 )
 
 func DefaultGetValidParams(c *gin.Context, params interface{}) error {
