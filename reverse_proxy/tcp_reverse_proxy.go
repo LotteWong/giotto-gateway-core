@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/LotteWong/giotto-gateway/load_balance"
+	"github.com/LotteWong/giotto-gateway-core/load_balance"
 	tcp "github.com/LotteWong/tcp-conn-server"
 )
 

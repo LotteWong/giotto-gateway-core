@@ -1,10 +1,11 @@
 package service
 
 import (
-	"github.com/LotteWong/giotto-gateway/dao/redis"
-	"github.com/LotteWong/giotto-gateway/models/po"
 	"sync"
 	"time"
+
+	"github.com/LotteWong/giotto-gateway-core/dao/redis"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
 )
 
 var flowCountService *FlowCountService

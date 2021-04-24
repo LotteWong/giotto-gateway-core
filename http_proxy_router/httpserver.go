@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LotteWong/giotto-gateway/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/common_middleware"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 )
@@ -17,21 +17,21 @@ var (
 )
 
 func HttpServerRun() {
-	gin.SetMode(lib.GetStringConf("proxy.base.debug_mode"))
-	r := InitRouter(
+	gin.SetMode(lib.ConfBase.DebugMode)
+	r := InitRouter([]gin.HandlerFunc{
 		common_middleware.RecoveryMiddleware(),
 		common_middleware.RequestLog(),
-	)
+	}...)
 	HttpSrvHandler = &http.Server{
-		Addr:           lib.GetStringConf("proxy.http.addr"),
+		Addr:           lib.GetStringConf("base.http.addr"),
 		Handler:        r,
-		ReadTimeout:    time.Duration(lib.GetIntConf("proxy.http.read_timeout")) * time.Second,
-		WriteTimeout:   time.Duration(lib.GetIntConf("proxy.http.write_timeout")) * time.Second,
-		MaxHeaderBytes: 1 << uint(lib.GetIntConf("proxy.http.max_header_bytes")),
+		ReadTimeout:    time.Duration(lib.GetIntConf("base.http.read_timeout")) * time.Second,
+		WriteTimeout:   time.Duration(lib.GetIntConf("base.http.write_timeout")) * time.Second,
+		MaxHeaderBytes: 1 << uint(lib.GetIntConf("base.http.max_header_bytes")),
 	}
-	log.Printf(" [INFO] HttpServerRun - http proxy server:%s\n", lib.GetStringConf("proxy.http.addr"))
+	log.Printf(" [INFO] HttpServerRun - http proxy server:%s\n", lib.GetStringConf("base.http.addr"))
 	if err := HttpSrvHandler.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf(" [ERROR] HttpServerRun - http proxy server:%s err:%v\n", lib.GetStringConf("proxy.http.addr"), err)
+		log.Fatalf(" [ERROR] HttpServerRun - http proxy server:%s err:%v\n", lib.GetStringConf("base.http.addr"), err)
 	}
 }
 
@@ -45,23 +45,23 @@ func HttpServerStop() {
 }
 
 func HttpsServerRun() {
-	gin.SetMode(lib.GetStringConf("proxy.base.debug_mode"))
-	r := InitRouter(
+	gin.SetMode(lib.GetStringConf("base.base.debug_mode"))
+	r := InitRouter([]gin.HandlerFunc{
 		common_middleware.RecoveryMiddleware(),
 		common_middleware.RequestLog(),
-	)
+	}...)
 	HttpsSrvHandler = &http.Server{
-		Addr:           lib.GetStringConf("proxy.https.addr"),
+		Addr:           lib.GetStringConf("base.https.addr"),
 		Handler:        r,
-		ReadTimeout:    time.Duration(lib.GetIntConf("proxy.https.read_timeout")) * time.Second,
-		WriteTimeout:   time.Duration(lib.GetIntConf("proxy.https.write_timeout")) * time.Second,
-		MaxHeaderBytes: 1 << uint(lib.GetIntConf("proxy.https.max_header_bytes")),
+		ReadTimeout:    time.Duration(lib.GetIntConf("base.https.read_timeout")) * time.Second,
+		WriteTimeout:   time.Duration(lib.GetIntConf("base.https.write_timeout")) * time.Second,
+		MaxHeaderBytes: 1 << uint(lib.GetIntConf("base.https.max_header_bytes")),
 	}
-	log.Printf(" [INFO] HttpsServerRun - https proxy server:%s\n", lib.GetStringConf("proxy.https.addr"))
-	certFile := lib.GetStringConf("proxy.https.cert_file")
-	keyFile := lib.GetStringConf("proxy.https.key_file")
+	log.Printf(" [INFO] HttpsServerRun - https proxy server:%s\n", lib.GetStringConf("base.https.addr"))
+	certFile := lib.GetStringConf("base.https.cert_file")
+	keyFile := lib.GetStringConf("base.https.key_file")
 	if err := HttpsSrvHandler.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
-		log.Fatalf(" [ERROR] HttpsServerRun - https proxy server:%s err:%v\n", lib.GetStringConf("proxy.https.addr"), err)
+		log.Fatalf(" [ERROR] HttpsServerRun - https proxy server:%s err:%v\n", lib.GetStringConf("base.https.addr"), err)
 	}
 }
 

@@ -1,4 +1,4 @@
-module github.com/LotteWong/giotto-gateway
+module github.com/LotteWong/giotto-gateway-core
 
 go 1.14
 

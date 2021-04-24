@@ -1,11 +1,12 @@
 package load_balance
 
 import (
-	"github.com/LotteWong/giotto-gateway/constants"
 	"net"
 	"reflect"
 	"sort"
 	"time"
+
+	"github.com/LotteWong/giotto-gateway-core/constants"
 )
 
 type ClientSvcDiscoveryLbConf struct {

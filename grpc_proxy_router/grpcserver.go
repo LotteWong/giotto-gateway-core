@@ -5,10 +5,10 @@ import (
 	"log"
 	"net"
 
-	"github.com/LotteWong/giotto-gateway/grpc_proxy_middleware"
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/reverse_proxy"
-	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway-core/grpc_proxy_middleware"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/reverse_proxy"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/e421083458/grpc-proxy/proxy"
 	"google.golang.org/grpc"
 )

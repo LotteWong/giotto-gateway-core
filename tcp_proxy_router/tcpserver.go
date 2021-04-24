@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/reverse_proxy"
-	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/reverse_proxy"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	tcp "github.com/LotteWong/tcp-conn-server"
 )
 

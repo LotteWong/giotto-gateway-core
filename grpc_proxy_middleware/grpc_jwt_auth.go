@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -14,6 +14,9 @@ import (
 
 func GrpcJwtAuthMiddleware(grpcServiceDetail *po.ServiceDetail) func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		var jwtErr error
+		var hdlErr error
+
 		metaCtx, ok := metadata.FromIncomingContext(stream.Context())
 		if !ok {
 			return errors.New("failed to get metadata context")
@@ -33,16 +36,19 @@ func GrpcJwtAuthMiddleware(grpcServiceDetail *po.ServiceDetail) func(srv interfa
 		tokenString := pair[1]
 
 		// verify jwt by expire at and issuer
-		var err error
 		switch tokenType {
 		case constants.JwtType:
-			err = service.GetJwtService().GrpcVerifyJwt(metaCtx, grpcServiceDetail, tokenString)
+			jwtErr = service.GetJwtService().GrpcVerifyJwt(metaCtx, grpcServiceDetail, tokenString)
 		default:
-			err = errors.New(fmt.Sprintf("not support jwt type %s", tokenType))
+			jwtErr = errors.New(fmt.Sprintf("not support jwt type %s", tokenType))
+		}
+		if jwtErr != nil {
+			return jwtErr
 		}
 
-		if err = handler(srv, stream); err != nil {
-			return err
+		hdlErr = handler(srv, stream)
+		if hdlErr != nil {
+			return hdlErr
 		}
 
 		return nil

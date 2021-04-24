@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/garyburd/redigo/redis"
 )

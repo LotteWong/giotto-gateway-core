@@ -1,7 +1,7 @@
 package load_balance
 
 import (
-	"github.com/LotteWong/giotto-gateway/constants"
+	"github.com/LotteWong/giotto-gateway-core/constants"
 )
 
 type LbType int

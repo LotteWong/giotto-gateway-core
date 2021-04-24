@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
 	tcp "github.com/LotteWong/tcp-conn-server"
 	"github.com/pkg/errors"
 )

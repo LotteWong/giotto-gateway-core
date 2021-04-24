@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/LotteWong/giotto-gateway/common_middleware"
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway-core/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )

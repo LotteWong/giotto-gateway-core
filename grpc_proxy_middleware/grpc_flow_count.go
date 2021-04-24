@@ -3,9 +3,9 @@ package grpc_proxy_middleware
 import (
 	"encoding/json"
 
-	"github.com/LotteWong/giotto-gateway/constants"
-	"github.com/LotteWong/giotto-gateway/models/po"
-	"github.com/LotteWong/giotto-gateway/service"
+	"github.com/LotteWong/giotto-gateway-core/constants"
+	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"

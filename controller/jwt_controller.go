@@ -3,13 +3,14 @@ package controller
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/LotteWong/giotto-gateway/common_middleware"
-	"github.com/LotteWong/giotto-gateway/models/dto"
-	"github.com/LotteWong/giotto-gateway/service"
+	"strings"
+
+	"github.com/LotteWong/giotto-gateway-core/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/models/dto"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 type JwtController struct{}
