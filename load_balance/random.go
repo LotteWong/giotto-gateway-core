@@ -1,9 +1,10 @@
 package load_balance
 
 import (
-	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 type RandomLb struct {
@@ -66,10 +67,22 @@ func (lb *RandomLb) Register(conf LoadBalanceConf) {
 
 // Subscribe is for observer to subscribe from subject
 func (lb *RandomLb) Subscribe() {
-	if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
-		lb.ips = []string{}
-		for _, pair := range conf.GetConf() {
-			lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
-		}
+	// TODO: strategy pattern improvement
+	// if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
+	// 	lb.ips = []string{}
+	// 	for _, pair := range conf.GetConf() {
+	// 		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
+	// 	}
+	// }
+	// if conf, ok := lb.conf.(*ServerSvcDiscoveryLbConf); ok {
+	// 	lb.ips = []string{}
+	// 	for _, pair := range conf.GetConf() {
+	// 		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
+	// 	}
+	// }
+
+	lb.ips = []string{}
+	for _, pair := range lb.conf.GetConf() {
+		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
 	}
 }

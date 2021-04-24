@@ -1,11 +1,12 @@
 package load_balance
 
 import (
-	"github.com/pkg/errors"
 	"hash/crc32"
 	"sort"
 	"strconv"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -94,7 +95,7 @@ func (lb *ConsistentHashLb) Get(key string) (string, error) {
 	}
 
 	lb.RWLock.Lock()
-	lb.RWLock.Unlock()
+	defer lb.RWLock.Unlock()
 
 	hash := lb.hashRing[idx]
 	ip := lb.hashMap[hash]
@@ -107,11 +108,26 @@ func (lb *ConsistentHashLb) Register(conf LoadBalanceConf) {
 }
 
 func (lb *ConsistentHashLb) Subscribe() {
-	if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
-		lb.hashMap = map[uint32]string{}
-		lb.hashRing = HashRing{}
-		for _, pair := range conf.GetConf() {
-			lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
-		}
+	// TODO: strategy pattern improvement
+	// if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
+	// 	lb.hashMap = map[uint32]string{}
+	// 	lb.hashRing = HashRing{}
+	// 	for _, pair := range conf.GetConf() {
+	// 		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
+	// 	}
+	// }
+
+	// if conf, ok := lb.conf.(*ServerSvcDiscoveryLbConf); ok {
+	// 	lb.hashMap = map[uint32]string{}
+	// 	lb.hashRing = HashRing{}
+	// 	for _, pair := range conf.GetConf() {
+	// 		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
+	// 	}
+	// }
+
+	lb.hashMap = map[uint32]string{}
+	lb.hashRing = HashRing{}
+	for _, pair := range lb.conf.GetConf() {
+		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
 	}
 }

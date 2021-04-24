@@ -2,16 +2,21 @@
     debug_mode="debug"
     time_location="Asia/Chongqing"
 
+[consul]
+    enable = true
+    ip = "127.0.0.1"
+    port = "8500"
+
 [http]
-    addr =":80"                         # 监听地址
+    addr = ":80"                         # 监听地址
     read_timeout = 10                   # 读取超时时长
     write_timeout = 10                  # 写入超时时长
     max_header_bytes = 20               # 最大的header大小，二进制位长度
 
 [https]
-    addr =":443"                        # 监听地址
+    addr = ":443"                        # 监听地址
     read_timeout = 10                   # 读取超时时长
     write_timeout = 10                  # 写入超时时长
     max_header_bytes = 20               # 最大的header大小，二进制位长度
-    cert_file="./assets/server.crt"       # 服务端证书文件
-    key_file="./assets/server.key"        # 服务端密钥文件
+    cert_file = "./assets/server.crt"       # 服务端证书文件
+    key_file = "./assets/server.key"        # 服务端密钥文件

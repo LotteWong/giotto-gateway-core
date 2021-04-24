@@ -9,6 +9,7 @@ import (
 	"github.com/LotteWong/giotto-gateway-core/dao/mysql"
 	"github.com/LotteWong/giotto-gateway-core/load_balance"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/e421083458/golang_common/lib"
 )
 
 var lbService *LbService
@@ -78,7 +79,15 @@ func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.Loa
 	}
 	format := fmt.Sprintf("%s%s", schema, "%s")
 
-	conf := load_balance.NewClientSvcDiscoveryLbConf(activeIps, ipWeightMap, format)
+	service := svc.Info.ServiceName
+	tag := fmt.Sprintf("%d", svc.Info.Id)
+
+	var conf load_balance.LoadBalanceConf
+	if lib.GetBoolConf("base.consul.enable") {
+		conf = load_balance.NewServerSvcDiscoveryLbConf(activeIps, ipWeightMap, format, service, tag)
+	} else {
+		conf = load_balance.NewClientSvcDiscoveryLbConf(activeIps, ipWeightMap, format)
+	}
 	lbr := load_balance.LoadBalanceWithConfFactory(load_balance.LbType(svc.LoadBalance.RoundType), conf)
 
 	// miss in cache, write back to cache
