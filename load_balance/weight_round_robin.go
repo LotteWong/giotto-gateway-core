@@ -1,8 +1,9 @@
 package load_balance
 
 import (
-	"github.com/pkg/errors"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 type WeightRoundRobinLb struct {
@@ -94,10 +95,22 @@ func (lb *WeightRoundRobinLb) Register(conf LoadBalanceConf) {
 }
 
 func (lb *WeightRoundRobinLb) Subscribe() {
-	if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
-		lb.nodes = []*IpAndWeightNode{}
-		for _, pair := range conf.GetConf() {
-			lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
-		}
+	// TODO: strategy pattern improvement
+	// if conf, ok := lb.conf.(*ClientSvcDiscoveryLbConf); ok {
+	// 	lb.nodes = []*IpAndWeightNode{}
+	// 	for _, pair := range conf.GetConf() {
+	// 		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
+	// 	}
+	// }
+	// if conf, ok := lb.conf.(*ServerSvcDiscoveryLbConf); ok {
+	// 	lb.nodes = []*IpAndWeightNode{}
+	// 	for _, pair := range conf.GetConf() {
+	// 		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
+	// 	}
+	// }
+
+	lb.nodes = []*IpAndWeightNode{}
+	for _, pair := range lb.conf.GetConf() {
+		lb.Add(pair.Ip, strconv.Itoa(pair.Weight))
 	}
 }
