@@ -34,7 +34,11 @@ func GetJwtService() *JwtService {
 }
 
 func (s *JwtService) GenerateJwt(ctx *gin.Context, tx *gorm.DB, req *dto.JwtReq, appId, secret string) (*dto.JwtRes, error) {
-	apps := GetAppService().ListAppsInMemory()
+	// apps := GetAppService().ListAppsInMemory()
+	apps, err := GetAppService().ListAppsFromRedis()
+	if err != nil {
+		return nil, err
+	}
 
 	for _, app := range apps {
 		if app.AppId == appId && app.Secret == secret {
@@ -77,7 +81,11 @@ func (s *JwtService) HttpVerifyJwt(ctx *gin.Context, svc *po.ServiceDetail, toke
 		}
 
 		// verify issuer
-		apps := GetAppService().ListAppsInMemory()
+		// apps := GetAppService().ListAppsInMemory()
+		apps, err := GetAppService().ListAppsFromRedis()
+		if err != nil {
+			return err
+		}
 		for _, app := range apps {
 			if app.AppId == claims.Issuer {
 				ctx.Set("app", app)
@@ -105,7 +113,11 @@ func (s *JwtService) GrpcVerifyJwt(ctx metadata.MD, svc *po.ServiceDetail, token
 		}
 
 		// verify issuer
-		apps := GetAppService().ListAppsInMemory()
+		// apps := GetAppService().ListAppsInMemory()
+		apps, err := GetAppService().ListAppsFromRedis()
+		if err != nil {
+			return err
+		}
 		for _, app := range apps {
 			if app.AppId == claims.Issuer {
 				ctx.Set("app", utils.Obj2Json(app))

@@ -2,12 +2,14 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"net/http/httptest"
 	"strings"
 	"sync"
 
 	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/dao/mysql"
+	"github.com/LotteWong/giotto-gateway-core/dao/redis"
 	"github.com/LotteWong/giotto-gateway-core/models/dto"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
 	"github.com/e421083458/golang_common/lib"
@@ -29,6 +31,8 @@ type SvcService struct {
 	protocolRuleOperator  *mysql.ProtocolRuleOperator
 	loadBalanceOperator   *mysql.LoadBalanceOperator
 	accessControlOperator *mysql.AccessControlOperator
+
+	serviceRedisConn *redis.ServiceOperator
 }
 
 func NewSvcService() *SvcService {
@@ -43,6 +47,8 @@ func NewSvcService() *SvcService {
 		protocolRuleOperator:  mysql.NewProtocolRuleOperator(),
 		loadBalanceOperator:   mysql.NewLoadBalanceOperator(),
 		accessControlOperator: mysql.NewAccessControlOperator(),
+
+		serviceRedisConn: redis.NewServiceOperator(),
 	}
 	return service
 }
@@ -54,42 +60,11 @@ func GetSvcService() *SvcService {
 	return svcService
 }
 
-func (s *SvcService) LoadServicesIntoMemory() error {
-	s.DCLock.Do(func() {
-		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
-		tx, err := lib.GetGormPool("default")
-		if err != nil {
-			s.InitErr = err
-			return
-		}
-
-		_, services, err := s.serviceOperator.FuzzySearchAndPage(ctx, tx, "", 0, 0)
-		if err != nil {
-			s.InitErr = err
-			return
-		}
-
-		s.RWLock.Lock()
-		defer s.RWLock.Unlock()
-
-		for _, service := range services {
-			serviceDetail, err := s.getServiceDetail(ctx, tx, service.Id)
-			if err != nil {
-				s.InitErr = err
-				return
-			}
-			s.ServiceMap[service.ServiceName] = serviceDetail
-			s.ServiceSlice = append(s.ServiceSlice, serviceDetail)
-		}
-	})
-
-	return s.InitErr
-}
-
 func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail, error) {
 	path := ctx.Request.URL.Path
 	host := ctx.Request.Host[0:strings.Index(ctx.Request.Host, ":")]
-	httpServices, _, _, err := s.GroupServicesInMemory()
+	// httpServices, _, _, err := s.GroupServicesInMemory()
+	httpServices, _, _, err := s.GroupServicesFromRedis()
 	if err != nil {
 		return nil, err
 	}
@@ -112,12 +87,100 @@ func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail
 	return nil, errors.New(fmt.Sprintf("no matched service for path %s and host %s", path, host))
 }
 
-func (s *SvcService) TcpProxyAccessService() ([]*po.ServiceDetail, error) {
-	_, tcpServices, _, err := s.GroupServicesInMemory()
+func (s *SvcService) LoadServicesFromRedis() error {
+	s.DCLock.Do(func() {
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		tx, err := lib.GetGormPool("default")
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		_, services, err := s.serviceOperator.FuzzySearchAndPage(ctx, tx, "", 0, 0)
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		s.RWLock.Lock()
+		defer s.RWLock.Unlock()
+
+		for _, service := range services {
+			tmp := service
+			serviceDetail, err := s.getServiceDetail(ctx, tx, tmp.Id)
+			if err != nil {
+				s.InitErr = err
+				return
+			}
+			err = s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail)
+			if err != nil {
+				s.InitErr = err
+				return
+			}
+		}
+	})
+
+	return s.InitErr
+}
+
+func (s *SvcService) GroupServicesFromRedis() ([]*po.ServiceDetail, []*po.ServiceDetail, []*po.ServiceDetail, error) {
+	var httpServices []*po.ServiceDetail
+	var tcpServices []*po.ServiceDetail
+	var grpcServices []*po.ServiceDetail
+
+	services, err := s.serviceRedisConn.ListServices()
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
-	return tcpServices, nil
+
+	for _, service := range services {
+		tmp := service
+		switch tmp.Info.ServiceType {
+		case constants.ServiceTypeHttp:
+			httpServices = append(httpServices, tmp)
+		case constants.ServiceTypeTcp:
+			tcpServices = append(tcpServices, tmp)
+		case constants.ServiceTypeGrpc:
+			grpcServices = append(grpcServices, tmp)
+		default:
+			return nil, nil, nil, errors.New(fmt.Sprintf("no such service type: %d", tmp.Info.ServiceType))
+		}
+	}
+
+	return httpServices, tcpServices, grpcServices, nil
+}
+
+func (s *SvcService) LoadServicesIntoMemory() error {
+	s.DCLock.Do(func() {
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		tx, err := lib.GetGormPool("default")
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		_, services, err := s.serviceOperator.FuzzySearchAndPage(ctx, tx, "", 0, 0)
+		if err != nil {
+			s.InitErr = err
+			return
+		}
+
+		s.RWLock.Lock()
+		defer s.RWLock.Unlock()
+
+		for _, service := range services {
+			tmp := service
+			serviceDetail, err := s.getServiceDetail(ctx, tx, tmp.Id)
+			if err != nil {
+				s.InitErr = err
+				return
+			}
+			s.ServiceMap[tmp.ServiceName] = serviceDetail
+			s.ServiceSlice = append(s.ServiceSlice, serviceDetail)
+		}
+	})
+
+	return s.InitErr
 }
 
 func (s *SvcService) GroupServicesInMemory() ([]*po.ServiceDetail, []*po.ServiceDetail, []*po.ServiceDetail, error) {
@@ -217,10 +280,24 @@ func (s *SvcService) concatServiceAddr(detail *po.ServiceDetail) string {
 }
 
 func (s *SvcService) ShowService(ctx *gin.Context, tx *gorm.DB, serviceId int64) (*po.ServiceDetail, error) {
-	serviceDetail, err := s.getServiceDetail(ctx, tx, serviceId)
-	if err != nil {
-		return nil, err
+	var serviceDetail *po.ServiceDetail
+	var redisErr, mysqlErr error
+
+	serviceDetail, redisErr = s.serviceRedisConn.GetService(serviceId)
+	if redisErr != nil {
+		serviceDetail, mysqlErr = s.getServiceDetail(ctx, tx, serviceId)
+		if mysqlErr != nil {
+			return nil, mysqlErr
+		}
+
+		log.Printf("show service %d miss redis, query in mysql\n", serviceId)
+
+		redisErr = s.serviceRedisConn.SetService(serviceId, serviceDetail)
+		if redisErr != nil {
+			return nil, redisErr
+		}
 	}
+
 	return serviceDetail, nil
 }
 
@@ -297,6 +374,10 @@ func (s *SvcService) CreateHttpService(ctx *gin.Context, tx *gorm.DB, req *dto.C
 
 	tx.Commit()
 
+	if err := s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail); err != nil {
+		return nil, err
+	}
+
 	return serviceDetail, nil
 }
 
@@ -368,6 +449,10 @@ func (s *SvcService) UpdateHttpService(ctx *gin.Context, tx *gorm.DB, req *dto.C
 
 	tx.Commit()
 
+	if err := s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail); err != nil {
+		return nil, err
+	}
+
 	return serviceDetail, nil
 }
 
@@ -436,6 +521,10 @@ func (s *SvcService) CreateTcpService(ctx *gin.Context, tx *gorm.DB, req *dto.Cr
 
 	tx.Commit()
 
+	if err := s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail); err != nil {
+		return nil, err
+	}
+
 	return serviceDetail, nil
 }
 
@@ -492,6 +581,10 @@ func (s *SvcService) UpdateTcpService(ctx *gin.Context, tx *gorm.DB, req *dto.Cr
 	}
 
 	tx.Commit()
+
+	if err := s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail); err != nil {
+		return nil, err
+	}
 
 	return serviceDetail, nil
 }
@@ -562,6 +655,10 @@ func (s *SvcService) CreateGrpcService(ctx *gin.Context, tx *gorm.DB, req *dto.C
 
 	tx.Commit()
 
+	if err := s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail); err != nil {
+		return nil, err
+	}
+
 	return serviceDetail, nil
 }
 
@@ -627,6 +724,10 @@ func (s *SvcService) UpdateGrpcService(ctx *gin.Context, tx *gorm.DB, req *dto.C
 
 	tx.Commit()
 
+	if err := s.serviceRedisConn.SetService(serviceDetail.Info.Id, serviceDetail); err != nil {
+		return nil, err
+	}
+
 	return serviceDetail, nil
 }
 
@@ -639,6 +740,10 @@ func (s *SvcService) DeleteService(ctx *gin.Context, tx *gorm.DB, serviceId int6
 	serviceInfo.IsDelete = 1
 	err = s.serviceOperator.Save(ctx, tx, serviceInfo)
 	if err != nil {
+		return err
+	}
+
+	if err := s.serviceRedisConn.DelService(serviceId); err != nil {
 		return err
 	}
 
