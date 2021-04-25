@@ -29,8 +29,10 @@ func InitCoreServer(config string) {
 	lib.InitModule(config, []string{"base", "mysql", "redis"})
 	defer lib.Destroy()
 
-	_ = service.GetSvcService().LoadServicesIntoMemory()
-	_ = service.GetAppService().LoadAppsIntoMemory()
+	// _ = service.GetSvcService().LoadServicesIntoMemory()
+	_ = service.GetSvcService().LoadServicesFromRedis()
+	// _ = service.GetAppService().LoadAppsIntoMemory()
+	_ = service.GetAppService().LoadAppsFromRedis()
 
 	go func() {
 		http_proxy_router.HttpServerRun()
