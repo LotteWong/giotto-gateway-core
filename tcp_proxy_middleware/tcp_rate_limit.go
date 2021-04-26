@@ -3,6 +3,7 @@ package tcp_proxy_middleware
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
@@ -31,13 +32,15 @@ func TcpRateLimitMiddleware() func(c *tcp.TcpRouterContext) {
 
 		if tcpServiceDetail.AccessControl.ServiceHostFlowLimit != 0 {
 			svrServiceName := constants.ServiceFlowCountPrefix + tcpServiceDetail.Info.ServiceName
-			svrRateLimit, err := service.GetRateLimitService().GetRateLimit(svrServiceName, tcpServiceDetail.AccessControl.ServiceHostFlowLimit)
+			svrRateLimit, err := service.GetRateLimitService().GetRateLimit(svrServiceName)
 			if err != nil {
 				c.Conn.Write([]byte(err.Error()))
 				c.Abort()
 				return
 			}
-			if !svrRateLimit.Allow() {
+			_, _, svrAllow := svrRateLimit.Allow(svrServiceName, tcpServiceDetail.AccessControl.ServiceHostFlowLimit, 1*time.Second)
+			// log.Printf("svr name:%s, count:%d\n", svrServiceName, svrCount)
+			if !svrAllow {
 				c.Conn.Write([]byte(errors.New(fmt.Sprintf("service host flow limit is %d, rate limit exceeds", tcpServiceDetail.AccessControl.ServiceHostFlowLimit)).Error()))
 				c.Abort()
 				return
@@ -55,13 +58,15 @@ func TcpRateLimitMiddleware() func(c *tcp.TcpRouterContext) {
 			clientIp = pair[0]
 
 			cltServiceName := constants.ServiceFlowCountPrefix + tcpServiceDetail.Info.ServiceName + "_" + clientIp
-			cltRateLimit, err := service.GetRateLimitService().GetRateLimit(cltServiceName, tcpServiceDetail.AccessControl.ClientIpFlowLimit)
+			cltRateLimit, err := service.GetRateLimitService().GetRateLimit(cltServiceName)
 			if err != nil {
 				c.Conn.Write([]byte(err.Error()))
 				c.Abort()
 				return
 			}
-			if !cltRateLimit.Allow() {
+			_, _, cltAllow := cltRateLimit.Allow(cltServiceName, tcpServiceDetail.AccessControl.ClientIpFlowLimit, 1*time.Second)
+			// log.Printf("clt name:%s, count:%d\n", cltServiceName, cltCount)
+			if !cltAllow {
 				c.Conn.Write([]byte(errors.New(fmt.Sprintf("client ip flow limit is %d, rate limit exceeds", tcpServiceDetail.AccessControl.ClientIpFlowLimit)).Error()))
 				c.Abort()
 				return
@@ -70,13 +75,15 @@ func TcpRateLimitMiddleware() func(c *tcp.TcpRouterContext) {
 
 		// if app.Qps != 0 {
 		// 	appServiceName := constants.AppFlowCountPrefix + app.AppId
-		// 	appRateLimit, err := service.GetRateLimitService().GetRateLimit(appServiceName, app.Qps)
+		// 	appRateLimit, err := service.GetRateLimitService().GetRateLimit(appServiceName)
 		// 	if err != nil {
 		// 		c.Conn.Write([]byte(err.Error()))
 		// 		c.Abort()
 		// 		return
 		// 	}
-		// 	if !appRateLimit.Allow() {
+		// 	_, _, appAllow := appRateLimit.Allow(appServiceName, app.Qps, 1*time.Second)
+		// 	// log.Printf("app name:%s, count:%d\n", appServiceName, appCount)
+		// 	if !appAllow {
 		// 		c.Conn.Write([]byte(errors.New(fmt.Sprintf("app flow limit is %d, rate limit exceeds", app.Qps)).Error()))
 		// 		c.Abort()
 		// 		return
