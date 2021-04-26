@@ -37,9 +37,9 @@ func InitCoreServer(config string) {
 	go func() {
 		http_proxy_router.HttpServerRun()
 	}()
-	// go func() {
-	// 	http_proxy_router.HttpsServerRun()
-	// }()
+	go func() {
+		http_proxy_router.HttpsServerRun()
+	}()
 	// go func() {
 	// 	tcp_proxy_router.TcpServerRun()
 	// }()
@@ -53,6 +53,6 @@ func InitCoreServer(config string) {
 
 	// grpc_proxy_router.GrpcServerStop()
 	// tcp_proxy_router.TcpServerStop()
-	// http_proxy_router.HttpsServerStop()
+	http_proxy_router.HttpsServerStop()
 	http_proxy_router.HttpServerStop()
 }

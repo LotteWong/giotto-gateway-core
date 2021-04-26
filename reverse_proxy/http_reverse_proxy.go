@@ -42,8 +42,9 @@ func NewHttpReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *h
 
 	// modify the source response to target response
 	modifyFunc := func(res *http.Response) error {
+		// support websocket protocol
 		if strings.Contains(res.Header.Get("Connection"), "Upgrade") {
-			// TODO: connection protocol upgrade
+			return nil
 		}
 		return nil
 	}

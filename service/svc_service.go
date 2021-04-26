@@ -62,7 +62,15 @@ func GetSvcService() *SvcService {
 
 func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail, error) {
 	path := ctx.Request.URL.Path
-	host := ctx.Request.Host[0:strings.Index(ctx.Request.Host, ":")]
+	var host string
+	colonIndex := strings.Index(ctx.Request.Host, ":")
+	if colonIndex != -1 {
+		// host doesn't contain port
+		host = ctx.Request.Host
+	} else {
+		// host does contain port
+		host = ctx.Request.Host[0:colonIndex]
+	}
 	// httpServices, _, _, err := s.GroupServicesInMemory()
 	httpServices, _, _, err := s.GroupServicesFromRedis()
 	if err != nil {
