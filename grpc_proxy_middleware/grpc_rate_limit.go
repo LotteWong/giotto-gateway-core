@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
@@ -31,11 +32,13 @@ func GrpcRateLimitMiddleware(grpcServiceDetail *po.ServiceDetail) func(srv inter
 
 		if grpcServiceDetail.AccessControl.ServiceHostFlowLimit != 0 {
 			svrServiceName := constants.ServiceFlowCountPrefix + grpcServiceDetail.Info.ServiceName
-			svrRateLimit, err := service.GetRateLimitService().GetRateLimit(svrServiceName, grpcServiceDetail.AccessControl.ServiceHostFlowLimit)
+			svrRateLimit, err := service.GetRateLimitService().GetRateLimit(svrServiceName)
 			if err != nil {
 				return err
 			}
-			if !svrRateLimit.Allow() {
+			_, _, svrAllow := svrRateLimit.Allow(svrServiceName, grpcServiceDetail.AccessControl.ServiceHostFlowLimit, 1*time.Second)
+			// log.Printf("svr name:%s, count:%d\n", svrServiceName, svrCount)
+			if !svrAllow {
 				return errors.New(fmt.Sprintf("service host flow limit is %d, rate limit exceeds", grpcServiceDetail.AccessControl.ServiceHostFlowLimit))
 			}
 		}
@@ -49,22 +52,26 @@ func GrpcRateLimitMiddleware(grpcServiceDetail *po.ServiceDetail) func(srv inter
 			clientIp := peerAddr[0:strings.LastIndex(peerAddr, ":")]
 
 			cltServiceName := constants.ServiceFlowCountPrefix + grpcServiceDetail.Info.ServiceName + "_" + clientIp
-			cltRateLimit, err := service.GetRateLimitService().GetRateLimit(cltServiceName, grpcServiceDetail.AccessControl.ClientIpFlowLimit)
+			cltRateLimit, err := service.GetRateLimitService().GetRateLimit(cltServiceName)
 			if err != nil {
 				return err
 			}
-			if !cltRateLimit.Allow() {
+			_, _, cltAllow := cltRateLimit.Allow(cltServiceName, grpcServiceDetail.AccessControl.ClientIpFlowLimit, 1*time.Second)
+			// log.Printf("clt name:%s, count:%d\n", cltServiceName, cltCount)
+			if !cltAllow {
 				return errors.New(fmt.Sprintf("client ip flow limit is %d, rate limit exceeds", grpcServiceDetail.AccessControl.ClientIpFlowLimit))
 			}
 		}
 
 		if app.Qps != 0 {
 			appServiceName := constants.AppFlowCountPrefix + app.AppId
-			appRateLimit, err := service.GetRateLimitService().GetRateLimit(appServiceName, app.Qps)
+			appRateLimit, err := service.GetRateLimitService().GetRateLimit(appServiceName)
 			if err != nil {
 				return err
 			}
-			if !appRateLimit.Allow() {
+			_, _, appAllow := appRateLimit.Allow(appServiceName, app.Qps, 1*time.Second)
+			// log.Printf("app name:%s, count:%d\n", appServiceName, appCount)
+			if !appAllow {
 				return errors.New(fmt.Sprintf("app flow limit is %d, rate limit exceeds", app.Qps))
 			}
 		}

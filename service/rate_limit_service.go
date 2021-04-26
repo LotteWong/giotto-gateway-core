@@ -4,7 +4,8 @@ import (
 	"sync"
 
 	"github.com/LotteWong/giotto-gateway-core/models/po"
-	"golang.org/x/time/rate"
+	"github.com/go-redis/redis"
+	"github.com/go-redis/redis_rate"
 )
 
 var rateLimitService *RateLimitService
@@ -31,7 +32,8 @@ func GetRateLimitService() *RateLimitService {
 	return rateLimitService
 }
 
-func (s *RateLimitService) GetRateLimit(serviceName string, qps int64) (*rate.Limiter, error) {
+// func (s *RateLimitService) GetRateLimit(serviceName string, qps int64) (*rate.Limiter, error) {
+func (s *RateLimitService) GetRateLimit(serviceName string) (*redis_rate.Limiter, error) {
 	// hit in cache, use cache data
 	for _, limit := range s.RateLimitSlice {
 		if limit.ServiceName == serviceName {
@@ -40,7 +42,12 @@ func (s *RateLimitService) GetRateLimit(serviceName string, qps int64) (*rate.Li
 	}
 
 	// miss in cache, new a rate limit
-	limiter := rate.NewLimiter(rate.Limit(qps), 3*int(qps))
+	// limiter := rate.NewLimiter(rate.Limit(qps), 3*int(qps))
+	// TODO: use config from file system
+	conn := redis.NewClient(&redis.Options{
+		Addr: "127.0.0.1:6379",
+	})
+	limiter := redis_rate.NewLimiter(conn)
 
 	// miss in cache, write back to cache
 	limit := &po.RateLimit{
