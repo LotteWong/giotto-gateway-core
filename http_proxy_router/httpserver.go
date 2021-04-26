@@ -45,7 +45,7 @@ func HttpServerStop() {
 }
 
 func HttpsServerRun() {
-	gin.SetMode(lib.GetStringConf("base.base.debug_mode"))
+	gin.SetMode(lib.ConfBase.DebugMode)
 	r := InitRouter([]gin.HandlerFunc{
 		common_middleware.RecoveryMiddleware(),
 		common_middleware.RequestLog(),
