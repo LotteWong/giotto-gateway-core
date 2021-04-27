@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewHttpReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *http.Transport) *httputil.ReverseProxy {
+func NewHttpReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *http.Transport, scheme string) *httputil.ReverseProxy {
 	// convert the source request to target request
 	director := func(req *http.Request) {
 		var err error
@@ -21,7 +21,7 @@ func NewHttpReverseProxy(ctx *gin.Context, lb load_balance.LoadBalance, trans *h
 		if err != nil {
 			panic(err)
 		}
-		targetUrl, err := url.Parse("http://" + targetStr)
+		targetUrl, err := url.Parse(scheme + targetStr)
 		if err != nil {
 			panic(err)
 		}

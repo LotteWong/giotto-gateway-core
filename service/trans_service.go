@@ -1,6 +1,7 @@
 package service
 
 import (
+	"crypto/tls"
 	"net"
 	"net/http"
 	"sync"
@@ -68,6 +69,7 @@ func (s *TransService) GetTransForSvc(svc *po.ServiceDetail) (*http.Transport, e
 		MaxIdleConns:          svc.LoadBalance.UpstreamMaxIdle,
 		IdleConnTimeout:       time.Duration(svc.LoadBalance.UpstreamIdleTimeout) * time.Second,
 		TLSHandshakeTimeout:   time.Duration(constants.DefaultTLSHandshakeTimeout) * time.Second,
+		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
 	}
 
 	// miss in cache, write back to cache

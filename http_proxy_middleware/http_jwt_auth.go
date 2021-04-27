@@ -24,7 +24,14 @@ func HttpJwtAuthMiddleware() gin.HandlerFunc {
 		httpServiceDetail := httpServiceInterface.(*po.ServiceDetail)
 
 		// parse authorization to get jwt
-		pair := strings.Split(c.GetHeader("Authorization"), " ")
+		var authHeader string
+		if c.GetHeader("Authorization") != "" {
+			authHeader = c.GetHeader("Authorization")
+		}
+		if c.GetHeader("Sec-Websocket-Protocol") != "" {
+			authHeader = c.GetHeader("Sec-Websocket-Protocol")
+		}
+		pair := strings.Split(authHeader, " ")
 		if len(pair) != 2 {
 			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("can not get jwt from authorization header"))
 			c.Abort()
