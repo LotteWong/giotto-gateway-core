@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/LotteWong/giotto-gateway-core/common_middleware"
+	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
 	"github.com/LotteWong/giotto-gateway-core/reverse_proxy"
 	"github.com/LotteWong/giotto-gateway-core/service"
@@ -35,7 +36,13 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 		}
 
 		// use reverse proxy to serve http
-		proxy := reverse_proxy.NewHttpReverseProxy(c, lb, trans)
+		var scheme string
+		if httpServiceDetail.HttpRule.NeedHttps == constants.Enable {
+			scheme = "https://"
+		} else {
+			scheme = "http://"
+		}
+		proxy := reverse_proxy.NewHttpReverseProxy(c, lb, trans, schema)
 		proxy.ServeHTTP(c.Writer, c.Request)
 
 		// abort the original server to be accessed

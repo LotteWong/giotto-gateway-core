@@ -64,7 +64,7 @@ func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail
 	path := ctx.Request.URL.Path
 	var host string
 	colonIndex := strings.Index(ctx.Request.Host, ":")
-	if colonIndex != -1 {
+	if colonIndex == -1 {
 		// host doesn't contain port
 		host = ctx.Request.Host
 	} else {
