@@ -42,7 +42,7 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 		} else {
 			scheme = "http://"
 		}
-		proxy := reverse_proxy.NewHttpReverseProxy(c, lb, trans, schema)
+		proxy := reverse_proxy.NewHttpReverseProxy(c, lb, trans, scheme)
 		proxy.ServeHTTP(c.Writer, c.Request)
 
 		// abort the original server to be accessed

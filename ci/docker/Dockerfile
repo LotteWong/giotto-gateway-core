@@ -2,6 +2,6 @@ FROM golang
 MAINTAINER LotteWong <lottewong21@gmail.com>
 
 WORKDIR /go/src/app
-COPY .. .
+COPY . .
 
-CMD ./bin/giotto_gateway_core -config ./config/prod/
+CMD ./bin/giotto_gateway_core -config ./configs/prod/
