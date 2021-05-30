@@ -39,7 +39,11 @@ func HttpRateLimitMiddleware() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			_, _, svrAllow := svrRateLimit.Allow(svrServiceName, httpServiceDetail.AccessControl.ServiceHostFlowLimit, 1*time.Second)
+			_, _, svrAllow := svrRateLimit.Allow(
+				svrServiceName,
+				httpServiceDetail.AccessControl.ServiceHostFlowLimit,
+				time.Duration(httpServiceDetail.AccessControl.ServiceHostFlowInterval)*time.Second,
+			)
 			// log.Printf("svr name:%s, count:%d\n", svrServiceName, svrCount)
 			if !svrAllow {
 				common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("service host flow limit is %d, rate limit exceeds", httpServiceDetail.AccessControl.ServiceHostFlowLimit)))
@@ -56,7 +60,11 @@ func HttpRateLimitMiddleware() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			_, _, cltAllow := cltRateLimit.Allow(cltServiceName, httpServiceDetail.AccessControl.ClientIpFlowLimit, 1*time.Second)
+			_, _, cltAllow := cltRateLimit.Allow(
+				cltServiceName,
+				httpServiceDetail.AccessControl.ClientIpFlowLimit,
+				time.Duration(httpServiceDetail.AccessControl.ClientIpFlowInterval)*time.Second,
+			)
 			// log.Printf("clt name:%s, count:%d\n", cltServiceName, cltCount)
 			if !cltAllow {
 				common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("client ip flow limit is %d, rate limit exceeds", httpServiceDetail.AccessControl.ClientIpFlowLimit)))
