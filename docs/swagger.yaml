@@ -1,0 +1,70 @@
+definitions:
+  common_middleware.Response:
+    properties:
+      data:
+        type: object
+      errmsg:
+        type: string
+      errno:
+        type: integer
+      stack:
+        type: object
+      trace_id:
+        type: object
+    type: object
+  dto.JwtReq:
+    properties:
+      permission:
+        description: 读写权限
+        type: string
+      type:
+        description: 令牌类型
+        type: string
+    type: object
+  dto.JwtRes:
+    properties:
+      expire_at:
+        description: 失效时间
+        type: integer
+      permission:
+        description: 读写权限
+        type: string
+      token:
+        description: 令牌内容
+        type: string
+      type:
+        description: 令牌类型
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /tokens/jwt:
+    post:
+      consumes:
+      - application/json
+      description: 生成认证令牌
+      operationId: /tokens/jwt
+      parameters:
+      - description: generate jwt request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.JwtReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/common_middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.JwtRes'
+              type: object
+      summary: 生成认证令牌接口
+      tags:
+      - 认证接口
+swagger: "2.0"

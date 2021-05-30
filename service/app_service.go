@@ -137,6 +137,7 @@ func (s *AppService) ListApps(ctx *gin.Context, tx *gorm.DB, req *dto.ListAppsRe
 			AppName:  item.AppName,
 			Secret:   item.Secret,
 			WhiteIps: item.WhiteIps,
+			BlackIps: item.BlackIps,
 			Qpd:      item.Qpd,
 			Qps:      item.Qps,
 			RealQpd:  count.TotalCount,
@@ -183,6 +184,7 @@ func (s *AppService) CreateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrU
 		AppName:  req.AppName,
 		Secret:   req.Secret,
 		WhiteIps: req.WhiteIps,
+		BlackIps: req.BlackIps,
 		Qps:      req.Qps,
 		Qpd:      req.Qpd,
 	}
@@ -217,6 +219,7 @@ func (s *AppService) UpdateApp(ctx *gin.Context, tx *gorm.DB, req *dto.CreateOrU
 	app.AppName = req.AppName
 	app.Secret = req.Secret
 	app.WhiteIps = req.WhiteIps
+	app.BlackIps = req.BlackIps
 	app.Qpd = req.Qpd
 	app.Qps = req.Qps
 	if err := s.appOperator.Save(ctx, tx, app); err != nil {
