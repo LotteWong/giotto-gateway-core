@@ -33,7 +33,6 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
 		schemeInterface, ok := c.Get("scheme")
 		if !ok {
 			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("scheme not found"))

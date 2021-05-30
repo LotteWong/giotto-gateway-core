@@ -5,6 +5,7 @@ import (
 	"log"
 	"reflect"
 	"sort"
+	"strconv"
 
 	"github.com/e421083458/golang_common/lib"
 	"github.com/hashicorp/consul/api"
@@ -66,12 +67,13 @@ func (c *ServerSvcDiscoveryLbConf) Publish() {
 	// TODO: use job instead of loop
 	go func() {
 		var lastIndex uint64
+		var isConfigured bool = len(c.ipWeightMap) > 0
 
 		for {
 			var newActiveIps []string
 
 			// gateway server health check backend server
-			serviceEntries, meta, err := client.Health().Service(c.service, c.tag, true, &api.QueryOptions{
+			serviceEntries, meta, err := client.Health().Service(c.service, "", true, &api.QueryOptions{
 				WaitIndex: lastIndex,
 			})
 			if err != nil {
@@ -80,7 +82,18 @@ func (c *ServerSvcDiscoveryLbConf) Publish() {
 			lastIndex = meta.LastIndex
 			for _, serviceEntry := range serviceEntries {
 				ip := fmt.Sprintf("%s:%d", serviceEntry.Service.Address, serviceEntry.Service.Port)
-				if _, ok := c.ipWeightMap[ip]; ok {
+				weight, _ := strconv.Atoi(serviceEntry.Service.Meta["weight"])
+
+				// if ip list and weight list are configured, follow the load balance configs
+				if isConfigured {
+					if _, ok := c.ipWeightMap[ip]; ok {
+						newActiveIps = append(newActiveIps, ip)
+					}
+				}
+
+				// if ip list and weight list are not configured, follow the service discovery configs
+				if !isConfigured {
+					c.ipWeightMap[ip] = weight
 					newActiveIps = append(newActiveIps, ip)
 				}
 			}

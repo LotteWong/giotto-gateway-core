@@ -67,7 +67,7 @@ func (s *JwtService) GenerateJwt(ctx *gin.Context, tx *gorm.DB, req *dto.JwtReq,
 		}
 	}
 
-	return nil, errors.New(fmt.Sprintf("secret %s for app %s is incorrect", secret, appId))
+	return nil, fmt.Errorf("secret %s for app %s is incorrect", secret, appId)
 }
 
 func (s *JwtService) HttpVerifyJwt(ctx *gin.Context, svc *po.ServiceDetail, tokenString string) error {

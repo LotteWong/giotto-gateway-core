@@ -1,13 +1,11 @@
 package http_proxy_middleware
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/LotteWong/giotto-gateway-core/common_middleware"
-	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/LotteWong/giotto-gateway-core/service"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -22,45 +20,28 @@ func HttpIpAuthMiddleware() gin.HandlerFunc {
 		}
 		httpServiceDetail := httpServiceInterface.(*po.ServiceDetail)
 
-		var whiteIpList []string
-		var blackIpList []string
-		openAuth := httpServiceDetail.AccessControl.OpenAuth
-		whiteList := httpServiceDetail.AccessControl.WhiteList
-		if whiteList != "" {
-			whiteIpList = strings.Split(whiteList, ",")
+		appInterface, ok := c.Get("app")
+		if !ok {
+			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("app not found"))
+			c.Abort()
+			return
 		}
-		blackList := httpServiceDetail.AccessControl.BlackList
-		if blackList != "" {
-			blackIpList = strings.Split(blackList, ",")
+		app := appInterface.(*po.App)
+
+		// ip auth for service
+		if err := service.GetIpService().VerifyIpListForService(c, httpServiceDetail); err != nil {
+			common_middleware.ResponseError(c, http.StatusInternalServerError, err)
+			c.Abort()
+			return
 		}
 
-		if openAuth == constants.Enable {
-			if len(whiteIpList) > 0 { // white list has higher priority
-				if !checkStrInSlice(whiteIpList, c.ClientIP()) {
-					common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("ip %s not in white ip list", c.ClientIP())))
-					c.Abort()
-					return
-				}
-			} else { // black list has lower priority
-				if len(blackIpList) > 0 {
-					if checkStrInSlice(blackIpList, c.ClientIP()) {
-						common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New(fmt.Sprintf("ip %s is in black ip list", c.ClientIP())))
-						c.Abort()
-						return
-					}
-				}
-			}
+		// ip auth for app
+		if err := service.GetIpService().VerifyIpListForApp(c, app); err != nil {
+			common_middleware.ResponseError(c, http.StatusInternalServerError, err)
+			c.Abort()
+			return
 		}
 
 		c.Next()
 	}
-}
-
-func checkStrInSlice(slice []string, str string) bool {
-	for _, item := range slice {
-		if item == str {
-			return true
-		}
-	}
-	return false
 }

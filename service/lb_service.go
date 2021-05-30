@@ -59,25 +59,25 @@ func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.Loa
 		ipWeightMap[ip] = weight
 	}
 
-	var schema string
+	var scheme string
 	switch svc.Info.ServiceType {
 	case constants.ServiceTypeHttp:
 		switch svc.HttpRule.NeedHttps {
 		case constants.Enable:
-			schema = "https://"
+			scheme = "https://"
 		case constants.Disable:
-			schema = "http://"
+			scheme = "http://"
 		default:
-			schema = "http://"
+			scheme = "http://"
 		}
 	case constants.ServiceTypeTcp:
-		schema = ""
+		scheme = ""
 	case constants.ServiceTypeGrpc:
-		schema = ""
+		scheme = ""
 	default:
-		schema = ""
+		scheme = ""
 	}
-	format := fmt.Sprintf("%s%s", schema, "%s")
+	format := fmt.Sprintf("%s%s", scheme, "%s")
 
 	service := svc.Info.ServiceName
 	tag := fmt.Sprintf("%d", svc.Info.Id)
