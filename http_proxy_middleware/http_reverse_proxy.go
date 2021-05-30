@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/LotteWong/giotto-gateway-core/common_middleware"
-	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
 	"github.com/LotteWong/giotto-gateway-core/reverse_proxy"
 	"github.com/LotteWong/giotto-gateway-core/service"
@@ -35,13 +34,15 @@ func HttpReverseProxyMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// use reverse proxy to serve http
-		var scheme string
-		if httpServiceDetail.HttpRule.NeedHttps == constants.Enable {
-			scheme = "https://"
-		} else {
-			scheme = "http://"
+		schemeInterface, ok := c.Get("scheme")
+		if !ok {
+			common_middleware.ResponseError(c, http.StatusInternalServerError, errors.New("scheme not found"))
+			c.Abort()
+			return
 		}
+		scheme := schemeInterface.(string)
+
+		// use reverse proxy to serve http
 		proxy := reverse_proxy.NewHttpReverseProxy(c, lb, trans, scheme)
 		proxy.ServeHTTP(c.Writer, c.Request)
 

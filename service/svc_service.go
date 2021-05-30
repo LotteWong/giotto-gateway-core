@@ -95,6 +95,38 @@ func (s *SvcService) HttpProxyAccessService(ctx *gin.Context) (*po.ServiceDetail
 	return nil, errors.New(fmt.Sprintf("no matched service for path %s and host %s", path, host))
 }
 
+func (s *SvcService) HttpProxyAccessScheme(ctx *gin.Context, detail *po.ServiceDetail) (string, error) {
+	if detail.HttpRule.NeedWebsocket == constants.Enable {
+		if connection := ctx.Request.Header.Get("Connection"); connection != "Upgrade" {
+			return "", errors.New("WebSocket protocol requeset header field `Connection` not ilegal.")
+		}
+		if upgrade := ctx.Request.Header.Get("Upgrade"); upgrade != "websocket" {
+			return "", errors.New("WebSocket protocol requeset header field `Upgrade` not ilegal.")
+		}
+		if secWebSocketKey := ctx.Request.Header.Get("Sec-WebSocket-Key"); secWebSocketKey == "" {
+			return "", errors.New("WebSocket protocol requeset header field `Sec-WebSocket-Key` not ilegal.")
+		}
+	} else {
+		connection := ctx.Request.Header.Get("Connection")
+		upgrade := ctx.Request.Header.Get("Upgrade")
+
+		http1HeaderCheck := connection == "keep-alive" && upgrade == ""
+		http2HeaderCheck := connection == "Upgrade, HTTP2-Settings" && upgrade == "h2c"
+
+		if (!http1HeaderCheck) && (!http2HeaderCheck) {
+			return "", errors.New("Http protocol requeset header field `Connection` and `Upgrade` not ilegal")
+		}
+	}
+
+	var scheme string
+	if detail.HttpRule.NeedHttps == constants.Enable {
+		scheme = "https://"
+	} else {
+		scheme = "http://"
+	}
+	return scheme, nil
+}
+
 func (s *SvcService) LoadServicesFromRedis() error {
 	s.DCLock.Do(func() {
 		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())

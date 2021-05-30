@@ -16,8 +16,16 @@ func HttpProxyAccessMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		// log.Printf("matched http service: %s\n", utils.Obj2Json(httpService))
 		c.Set("service", httpService)
+
+		scheme, err := service.GetSvcService().HttpProxyAccessScheme(c, httpService)
+		if err != nil {
+			common_middleware.ResponseError(c, http.StatusInternalServerError, err)
+			c.Abort()
+			return
+		}
+		c.Set("scheme", scheme)
+
 		c.Next()
 	}
 }
