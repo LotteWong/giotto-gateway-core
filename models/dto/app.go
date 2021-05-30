@@ -22,6 +22,7 @@ type ListAppItem struct {
 	AppName  string `json:"name" form:"name" comment:"租户名称" validate:""`
 	Secret   string `json:"secret" form:"secret" comment:"租户密钥" validate:""`
 	WhiteIps string `json:"white_ips" form:"white_ips" comment:"ip白名单，支持前缀匹配" validate:""`
+	BlackIps string `json:"black_ips" form:"black_ips" comment:"ip黑名单，支持前缀匹配" validate:""`
 	Qpd      int64  `json:"qpd" form:"qpd" comment:"每日请求量限制" validate:""`
 	Qps      int64  `json:"qps" form:"qps" comment:"每秒请求量限制" validate:""`
 	RealQpd  int64  `json:"real_qpd" form:"real_qpd" comment:"每日实际请求量" validate:""`
@@ -37,6 +38,7 @@ type CreateOrUpdateAppReq struct {
 	AppName  string `json:"app_name" form:"app_name" comment:"租户名称" validate:""`           // 租户名称
 	Secret   string `json:"secret" form:"secret" comment:"租户密钥" validate:""`               // 租户密钥
 	WhiteIps string `json:"white_ips" form:"white_ips" comment:"ip白名单，支持前缀匹配" validate:""` // ip白名单，支持前缀匹配
+	BlackIps string `json:"black_ips" form:"black_ips" comment:"ip黑名单，支持前缀匹配" validate:""` // ip黑名单，支持前缀匹配
 	Qpd      int64  `json:"qpd" form:"qpd" comment:"每日请求量限制" validate:""`                  // 每日请求量限制
 	Qps      int64  `json:"qps" form:"qps" comment:"每秒请求量限制" validate:""`                  // 每秒请求量限制
 }

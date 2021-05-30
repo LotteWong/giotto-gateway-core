@@ -1,0 +1,111 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/tokens/jwt": {
+            "post": {
+                "description": "生成认证令牌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "认证接口"
+                ],
+                "summary": "生成认证令牌接口",
+                "operationId": "/tokens/jwt",
+                "parameters": [
+                    {
+                        "description": "generate jwt request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.JwtReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common_middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.JwtRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "common_middleware.Response": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "errmsg": {
+                    "type": "string"
+                },
+                "errno": {
+                    "type": "integer"
+                },
+                "stack": {
+                    "type": "object"
+                },
+                "trace_id": {
+                    "type": "object"
+                }
+            }
+        },
+        "dto.JwtReq": {
+            "type": "object",
+            "properties": {
+                "permission": {
+                    "description": "读写权限",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "令牌类型",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.JwtRes": {
+            "type": "object",
+            "properties": {
+                "expire_at": {
+                    "description": "失效时间",
+                    "type": "integer"
+                },
+                "permission": {
+                    "description": "读写权限",
+                    "type": "string"
+                },
+                "token": {
+                    "description": "令牌内容",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "令牌类型",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

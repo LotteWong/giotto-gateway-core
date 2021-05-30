@@ -125,6 +125,9 @@ func TranslationMiddleware() gin.HandlerFunc {
 
 			// 验证ip:port格式
 			val.RegisterValidation("valid_ip_port_list", func(fl validator.FieldLevel) bool {
+				if fl.Field().String() == "" {
+					return true
+				}
 				for _, addr := range strings.Split(fl.Field().String(), ",") {
 					if isMatch, _ := regexp.Match(`^\S+\:\d+$`, []byte(addr)); !isMatch {
 						return false

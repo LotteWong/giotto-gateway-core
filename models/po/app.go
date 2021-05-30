@@ -8,6 +8,7 @@ type App struct {
 	AppName   string    `json:"app_name" gorm:"column:app_name" description:"租户名称"`
 	Secret    string    `json:"secret" gorm:"column:secret" description:"租户密钥"`
 	WhiteIps  string    `json:"white_ips" gorm:"column:white_ips" description:"ip白名单，支持前缀匹配"`
+	BlackIps  string    `json:"black_ips" gorm:"column:black_ips" description:"ip黑名单，支持前缀匹配"`
 	Qpd       int64     `json:"qpd" gorm:"column:qpd" description:"每日请求量限制"`
 	Qps       int64     `json:"qps" gorm:"column:qps" description:"每秒请求量限制"`
 	CreatedAt time.Time `json:"create_at" gorm:"column:create_at" description:"创建时间"`
