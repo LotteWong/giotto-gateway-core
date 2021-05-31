@@ -790,16 +790,75 @@ func (s *SvcService) UpdateGrpcService(ctx *gin.Context, tx *gorm.DB, req *dto.C
 }
 
 func (s *SvcService) DeleteService(ctx *gin.Context, tx *gorm.DB, serviceId int64) error {
-	serviceInfo, err := s.serviceOperator.Find(ctx, tx, &po.ServiceInfo{Id: serviceId})
+	// serviceInfo, err := s.serviceOperator.Find(ctx, tx, &po.ServiceInfo{Id: serviceId})
+	// if err != nil {
+	// 	return err
+	// }
+
+	// serviceInfo.IsDelete = 1
+	// err = s.serviceOperator.Save(ctx, tx, serviceInfo)
+	// if err != nil {
+	// 	return err
+	// }
+
+	tx = tx.Begin()
+
+	serviceDetail, err := s.getServiceDetail(ctx, tx, serviceId)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
+	// delete from service info table
+	serviceInfo := serviceDetail.Info
 	serviceInfo.IsDelete = 1
-	err = s.serviceOperator.Save(ctx, tx, serviceInfo)
-	if err != nil {
+	if err := s.serviceOperator.Save(ctx, tx, serviceInfo); err != nil {
+		tx.Rollback()
 		return err
 	}
+
+	// delete from protocol rule table
+	switch serviceDetail.Info.ServiceType {
+	case constants.ServiceTypeHttp:
+		httpRule := serviceDetail.HttpRule
+		httpRule.IsDelete = 1
+		if err := s.protocolRuleOperator.SaveHttpRule(ctx, tx, httpRule); err != nil {
+			tx.Rollback()
+			return err
+		}
+	case constants.ServiceTypeTcp:
+		tcpRule := serviceDetail.TcpRule
+		tcpRule.IsDelete = 1
+		if err := s.protocolRuleOperator.SaveTcpRule(ctx, tx, tcpRule); err != nil {
+			tx.Rollback()
+			return err
+		}
+	case constants.ServiceTypeGrpc:
+		grpcRule := serviceDetail.GrpcRule
+		grpcRule.IsDelete = 1
+		if err := s.protocolRuleOperator.SaveGrpcRule(ctx, tx, grpcRule); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// delete from load balance table
+	loadBalance := serviceDetail.LoadBalance
+	loadBalance.IsDelete = 1
+	if err := s.loadBalanceOperator.Save(ctx, tx, loadBalance); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// delete from access control table
+	accessControl := serviceDetail.AccessControl
+	accessControl.IsDelete = 1
+	if err := s.accessControlOperator.Save(ctx, tx, accessControl); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 
 	if err := s.serviceRedisConn.DelService(serviceId); err != nil {
 		return err
