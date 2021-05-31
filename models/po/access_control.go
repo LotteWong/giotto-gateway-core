@@ -14,6 +14,8 @@ type AccessControl struct {
 	ClientIpFlowInterval    int   `json:"client_ip_flow_interval" gorm:"column:client_ip_flow_interval" description:"客户端ip限流间隔"`
 	ServiceHostFlowLimit    int64 `json:"service_host_flow_limit" gorm:"column:service_host_flow_limit" description:"服务端主机限流"`
 	ServiceHostFlowInterval int   `json:"service_host_flow_interval" gorm:"column:service_host_flow_interval" description:"服务端主机限流间隔"`
+
+	IsDelete int `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
 }
 
 func (t *AccessControl) TableName() string {

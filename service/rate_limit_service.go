@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/LotteWong/giotto-gateway-core/models/po"
+	"github.com/e421083458/golang_common/lib"
 	"github.com/go-redis/redis"
 	"github.com/go-redis/redis_rate"
 )
@@ -43,9 +44,8 @@ func (s *RateLimitService) GetRateLimit(serviceName string) (*redis_rate.Limiter
 
 	// miss in cache, new a rate limit
 	// limiter := rate.NewLimiter(rate.Limit(qps), 3*int(qps))
-	// TODO: use config from file system
 	conn := redis.NewClient(&redis.Options{
-		Addr: "127.0.0.1:6379",
+		Addr: lib.GetStringSliceConf("redis_map.list.default.proxy_list")[0],
 	})
 	limiter := redis_rate.NewLimiter(conn)
 

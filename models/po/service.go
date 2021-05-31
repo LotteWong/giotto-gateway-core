@@ -29,3 +29,8 @@ type ServicePercentage struct {
 	ServiceType  int   `json:"service_type" description:"服务类型"`
 	ServiceCount int64 `json:"service_count" description:"服务个数"`
 }
+
+type HttpServicePercentage struct {
+	HttpServiceType  int   `json:"http_service_type" description:"HTTP服务类型"`
+	HttpServiceCount int64 `json:"http_service_count" description:"HTTP服务个数"`
+}

@@ -22,6 +22,8 @@ type LoadBalance struct {
 	UpstreamHeaderTimeout  int `json:"upstream_header_timeout" gorm:"column:upstream_header_timeout" description:"下游获取头部超时, 单位为s"`
 	UpstreamIdleTimeout    int `json:"upstream_idle_timeout" gorm:"column:upstream_idle_timeout" description:"下游连接最大空闲时间, 单位为s"`
 	UpstreamMaxIdle        int `json:"upstream_max_idle" gorm:"column:upstream_max_idle" description:"下游最大空闲连接数量"`
+
+	IsDelete int `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
 }
 
 func (t *LoadBalance) TableName() string {
