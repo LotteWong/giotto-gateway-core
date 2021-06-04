@@ -7,6 +7,7 @@ import (
 
 	"github.com/LotteWong/giotto-gateway-core/constants"
 	"github.com/LotteWong/giotto-gateway-core/dao/mysql"
+	"github.com/LotteWong/giotto-gateway-core/dao/redis"
 	"github.com/LotteWong/giotto-gateway-core/load_balance"
 	"github.com/LotteWong/giotto-gateway-core/models/po"
 	"github.com/e421083458/golang_common/lib"
@@ -20,6 +21,7 @@ type LbService struct {
 	RWLock           sync.RWMutex
 
 	loadBalanceOperator *mysql.LoadBalanceOperator
+	serviceRedisConn    *redis.ServiceOperator
 }
 
 func NewLbService() *LbService {
@@ -28,6 +30,7 @@ func NewLbService() *LbService {
 		LoadBalanceSlice:    []*po.LoadBalanceDetail{},
 		RWLock:              sync.RWMutex{},
 		loadBalanceOperator: mysql.NewLoadBalanceOperator(),
+		serviceRedisConn:    redis.NewServiceOperator(),
 	}
 	return service
 }
@@ -41,10 +44,8 @@ func GetLbService() *LbService {
 
 func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.LoadBalance, error) {
 	// hit in cache, use cache data
-	for _, lb := range s.LoadBalanceSlice {
-		if lb.ServiceName == svc.Info.ServiceName {
-			return lb.LoadBalancer, nil
-		}
+	if lb, err := s.checkHitCache(svc.Info.Id, svc.Info.ServiceName); err == nil {
+		return lb.LoadBalancer, nil
 	}
 
 	// miss in cache, new a load balance with config
@@ -52,11 +53,13 @@ func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.Loa
 	weights := svc.LoadBalance.GetWeightList()
 	ipWeightMap := map[string]int{}
 	for idx, ip := range activeIps {
-		weight, err := strconv.Atoi(weights[idx])
-		if err != nil {
-			return nil, err
+		if ip != "" {
+			weight, err := strconv.Atoi(weights[idx])
+			if err != nil {
+				return nil, err
+			}
+			ipWeightMap[ip] = weight
 		}
-		ipWeightMap[ip] = weight
 	}
 
 	var scheme string
@@ -93,6 +96,7 @@ func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.Loa
 	// miss in cache, write back to cache
 	lb := &po.LoadBalanceDetail{
 		LoadBalancer: lbr,
+		LoadBalance:  svc.LoadBalance,
 		ServiceName:  svc.Info.ServiceName,
 	}
 
@@ -102,4 +106,36 @@ func (s *LbService) GetLbWithConfForSvc(svc *po.ServiceDetail) (load_balance.Loa
 	s.LoadBalanceMap[svc.Info.ServiceName] = lb
 
 	return lbr, nil
+}
+
+func (s *LbService) checkHitCache(serviceId int64, serviceName string) (*po.LoadBalanceDetail, error) {
+	svcDetail, err := s.serviceRedisConn.GetService(serviceId)
+	if err != nil {
+		return nil, err
+	}
+
+	lbDetail, ok := s.LoadBalanceMap[serviceName]
+	if !ok {
+		return nil, fmt.Errorf("no such load balance of %s in map", serviceName)
+	}
+
+	lbRoundType := lbDetail.LoadBalance.RoundType
+	svcRoundType := svcDetail.LoadBalance.RoundType
+	if lbRoundType != svcRoundType {
+		return nil, fmt.Errorf("lb round type changed: %d -> %d", lbRoundType, svcRoundType)
+	}
+
+	lbIpList := lbDetail.LoadBalance.IpList
+	svcIpList := svcDetail.LoadBalance.IpList
+	if lbIpList != svcIpList {
+		return nil, fmt.Errorf("lb ip list changed: %s -> %s", lbIpList, svcIpList)
+	}
+
+	lbWeightList := lbDetail.LoadBalance.WeightList
+	svcWeightList := svcDetail.LoadBalance.WeightList
+	if lbWeightList != svcWeightList {
+		return nil, fmt.Errorf("lb weight list changed: %s -> %s", lbWeightList, svcWeightList)
+	}
+
+	return lbDetail, nil
 }

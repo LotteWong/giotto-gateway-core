@@ -43,6 +43,7 @@ func (t *LoadBalance) GetWeightList() []string {
 }
 
 type LoadBalanceDetail struct {
-	LoadBalancer load_balance.LoadBalance `json:"load_balance" description:"负载均衡器"`
+	LoadBalancer load_balance.LoadBalance `json:"load_balancer" description:"负载均衡器"`
+	LoadBalance  *LoadBalance             `json:"load_balance" description:"负载均衡"`
 	ServiceName  string                   `json:"service_name" description:"服务名称"`
 }
