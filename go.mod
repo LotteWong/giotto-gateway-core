@@ -15,6 +15,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redis/redis/v8 v8.9.0
 	github.com/go-redis/redis_rate v6.5.0+incompatible
 	github.com/hashicorp/consul/api v1.8.1
 	github.com/json-iterator/go v1.1.10 // indirect

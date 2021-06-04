@@ -97,7 +97,7 @@ func (c *ServerSvcDiscoveryLbConf) Publish() {
 					newActiveIps = append(newActiveIps, ip)
 				}
 			}
-			log.Printf("consul watch ips update: %v", newActiveIps)
+			log.Printf("service %s - consul watch ips update: %v", c.service, newActiveIps)
 
 			// update active ips and Notify load balances
 			sort.Strings(newActiveIps)
